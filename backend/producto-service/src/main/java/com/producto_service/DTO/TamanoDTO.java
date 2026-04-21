@@ -1,0 +1,21 @@
+package com.producto_service.DTO;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TamanoDTO {
+
+    private Integer id;
+
+    @NotBlank(message = "El nombre del tamaño es obligatorio")
+    @Size(min = 1, max = 50, message = "El nombre debe tener entre 1 y 50 caracteres")
+    private String nombre;
+
+    private Boolean activo = true;
+}

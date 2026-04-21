@@ -1,0 +1,33 @@
+# application-test.yml (perfil: test)
+
+spring:
+  mail:
+    host: smtp.test.com
+    port: 1025
+    username: test@example.com
+    password: testpassword
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/notifications-test
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+  # puerto 0 permite que el sistema operativo asigne un puerto libre (útil en tests)
+  port: 0
+
+springdoc:
+  swagger-ui:
+    enabled: false
+
+

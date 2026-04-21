@@ -1,0 +1,25 @@
+.massy-custom-pricing{align-items:var(--massy-custom-pricing-align-items,flex-start);display:var(--massy-custom-pricing-display,inline-flex);flex-direction:var(--massy-custom-pricing-flex-direction,column);gap:var(--massy-custom-pricing-gap,4px 1em)}.massy-custom-pricing-price-with-badge{align-items:var(
+    --massy-custom-pricing-price-with-badge-align-items,var(--massy-custom-pricing-align-items,center)
+  );display:var(
+    --massy-custom-pricing-price-with-badge-display,var(--massy-custom-pricing-display,inline-flex)
+  );flex-direction:var(
+    --massy-custom-pricing-price-with-badge-flex-direction,var(--massy-custom-pricing-flex-direction,row)
+  );gap:var(
+    --massy-custom-pricing-price-with-badge-gap,var(--massy-custom-pricing-gap,4px 1em)
+  );justify-content:var(
+    --massy-custom-pricing-price-with-badge-justify-content,var(--massy-custom-pricing-justify-content,flex-start)
+  )}.massy-custom-pricing-price-wrapper{align-items:var(
+    --massy-custom-pricing-price-wrapper-align-items,var(--massy-custom-pricing-align-items,center)
+  );display:var(
+    --massy-custom-pricing-price-wrapper-display,var(--massy-custom-pricing-display,inline-flex)
+  );flex-direction:var(
+    --massy-custom-pricing-price-wrapper-flex-direction,var(--massy-custom-pricing-flex-direction,row)
+  );gap:var(
+    --massy-custom-pricing-price-wrapper-gap,var(--massy-custom-pricing-gap,4px 1em)
+  );justify-content:var(
+    --massy-custom-pricing-price-wrapper-justify-content,var(--massy-custom-pricing-justify-content,flex-start)
+  )}.massy-custom-pricing-align-right .massy-custom-pricing{align-items:var(--massy-custom-pricing-align-items,flex-end)}.massy-custom-pricing-align-right .massy-custom-pricing-price-with-badge{justify-content:var(
+    --massy-custom-pricing-price-with-badge-justify-content,var(--massy-custom-pricing-justify-content,flex-end)
+  )}.massy-custom-pricing-align-right .massy-custom-pricing-price-wrapper{justify-content:var(
+    --massy-custom-pricing-price-wrapper-justify-content,var(--massy-custom-pricing-justify-content,flex-end)
+  )}.massy-custom-pricing-price-vat{padding-inline-start:2px}.massy-custom-pricing-price-compare-at,.massy-custom-pricing-price-discount,.massy-custom-pricing-price-original,.massy-custom-pricing-price-regular{color:var(--massy-custom-pricing-price-text-color);display:inline-block;font-size:var(--massy-custom-pricing-price-font-size);white-space:nowrap}.massy-custom-pricing-price-compare-at,.massy-custom-pricing-price-original{text-decoration:line-through}.massy-custom-pricing-measurement{display:inline-block;white-space:nowrap}.massy-custom-pricing-price-compare-at .massy-custom-pricing-measurement,.massy-custom-pricing-price-original .massy-custom-pricing-measurement{text-decoration:line-through}.massy-custom-pricing-badge{background-color:var(--massy-custom-pricing-badge-background-color);border-radius:var(--massy-custom-pricing-badge-border-radius);color:var(--massy-custom-pricing-badge-text-color);display:var(--massy-discount-badge-display,inline-block);font-size:var(--massy-custom-pricing-badge-font-size);padding:2px 8px;vertical-align:baseline;white-space:nowrap}massy-discount-badge:empty,massy-timer:empty{display:none}.massy-custom-pricing-timer{background-color:var(--massy-custom-pricing-timer-background-color);border-radius:var(--massy-custom-pricing-timer-border-radius);color:var(--massy-custom-pricing-timer-text-color);font-size:var(--massy-custom-pricing-timer-font-size);padding:2px 8px}.massy-tax-both-price{display:inline-grid}.massy-tax-exclusive,.massy-tax-exclusive .massy-price,.massy-tax-exclusive .massy-tax-label,.massy-tax-inclusive,.massy-tax-inclusive .massy-price,.massy-tax-inclusive .massy-tax-label{white-space:nowrap}

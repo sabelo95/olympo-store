@@ -1,0 +1,177 @@
+version: '3.8'
+
+services:
+
+  # ===============================
+  # PostgreSQL Database
+  # ===============================
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=db_ARKA
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ../database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - arka-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===============================
+  # MongoDB Database
+  # ===============================
+  mongodb:
+    image: mongo:7
+    container_name: mongodb-db
+    environment:
+      - MONGO_INITDB_DATABASE=Notificaciones_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - arka-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ===============================
+  # API Gateway
+  # ===============================
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - arka-network
+
+  # ===============================
+  # Login Service
+  # ===============================
+  login-service:
+    build:
+      context: ./login-service
+    container_name: login-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_ARKA
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - arka-network
+
+  # ===============================
+  # Producto Service
+  # ===============================
+  producto-service:
+    build:
+      context: ./producto-service
+    container_name: producto-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_ARKA
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SPRING_PROFILES_ACTIVE=docker
+    volumes:
+      - "./reportes:/app/reportes"
+    networks:
+      - arka-network
+
+  # ===============================
+  # Compras Service
+  # ===============================
+  compras-service:
+    build:
+      context: ./compras-service
+    container_name: compras-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/db_ARKA
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - arka-network
+
+  # ===============================
+  # Notificaciones Service
+  # ===============================
+  notificaciones-service:
+    build:
+      context: ./notificaciones-service
+      dockerfile: Dockerfile
+    container_name: notificaciones-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      # Perfil
+      - SPRING_PROFILES_ACTIVE=docker
+
+      # Configuración de correo (Gmail)
+      - SPRING_MAIL_HOST=smtp.gmail.com
+      - SPRING_MAIL_PORT=587
+      - SPRING_MAIL_USERNAME=santiagoberriolopez@gmail.com
+      - SPRING_MAIL_PASSWORD=tadi jpns ynmy pigt
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=true
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=true
+
+      # Conexión a MongoDB desde contenedor
+      - SPRING_DATA_MONGODB_HOST=mongodb
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=Notificaciones_db
+
+      # Configuración de subida de archivos
+      - SPRING_SERVLET_MULTIPART_ENABLED=true
+      - SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=20MB
+      - SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=20MB
+
+      # Puerto del microservicio
+      - SERVER_PORT=8085
+    networks:
+      - arka-network
+
+# ===============================
+# Definición de redes
+# ===============================
+networks:
+  arka-network:
+    driver: bridge
+
+# ===============================
+# Volúmenes para persistencia de datos
+# ===============================
+volumes:
+  postgres-data:
+  mongodb-data:

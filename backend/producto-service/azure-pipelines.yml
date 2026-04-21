@@ -1,0 +1,51 @@
+# Pipeline para Microservicio de Productos
+# Construye el JAR y prepara el artefacto con Dockerfile para despliegue en AWS ECR
+
+trigger:
+- master
+
+pool:
+  name: sblAgent
+  demands:
+  - JAVA_HOME_17_X64
+  - java
+
+variables:
+  serviceName: 'productos'
+
+steps:
+
+- task: Gradle@3
+  displayName: 'Build JAR - Microservicio Productos'
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    tasks: 'build -x test'  # Omite los tests
+    gradleOpts: '-Xmx2048m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.17'
+    jdkArchitectureOption: 'x64'
+
+- task: CopyFiles@2
+  displayName: 'Copiar JAR a carpeta de despliegue'
+  inputs:
+    SourceFolder: 'build/libs'
+    Contents: |
+      *.jar
+      !*plain.jar
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/$(serviceName)'
+
+- task: CopyFiles@2
+  displayName: 'Copiar Dockerfile a carpeta de despliegue'
+  inputs:
+    SourceFolder: '$(Build.Repository.LocalPath)'
+    Contents: |
+      Dockerfile
+      docker-compose.yml
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/$(serviceName)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publicar artefacto para despliegue'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(serviceName)'
+    ArtifactName: '$(serviceName)-artifact'
+    publishLocation: 'Container'

@@ -1,0 +1,198 @@
+.productos-admin {
+  padding: 24px 20px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Header ── */
+.productos-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.productos-admin-header h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #1a1a2e;
+}
+
+.header-botones {
+  display: flex;
+  gap: 10px;
+}
+
+/* ── Botones ── */
+.btn-reporte {
+  padding: 10px 20px;
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btn-reporte:hover { background-color: #138496; }
+
+.btn-agregar {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btn-agregar:hover { background-color: #218838; }
+
+/* ── Info y filtros ── */
+.tabla-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #555;
+}
+
+.btn-limpiar {
+  padding: 5px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.btn-limpiar:hover { background-color: #f0f0f0; }
+
+/* ── Tabla ── */
+.tabla-wrapper { overflow-x: auto; }
+
+.tabla-productos {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+  font-size: 14px;
+}
+
+.tabla-productos th {
+  padding: 10px 12px;
+  background-color: #f0f0f0;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.tabla-productos td {
+  padding: 9px 12px;
+  border: 1px solid #eee;
+  color: #444;
+}
+
+.tabla-productos tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Fila de filtros */
+.fila-filtros th {
+  background-color: #f9f9f9;
+  padding: 6px 8px;
+}
+
+.filtro-input {
+  width: 95%;
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.filtro-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* ── Acciones ── */
+.btn-editar {
+  padding: 5px 12px;
+  margin-right: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.btn-editar:hover { background-color: #e9ecef; }
+
+.btn-eliminar {
+  padding: 5px 12px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.btn-eliminar:hover { background-color: #c82333; }
+
+/* ── Paginación ── */
+.paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-pagina-nav {
+  padding: 6px 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-pagina-nav:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn-pagina-num {
+  padding: 6px 11px;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  background-color: #fff;
+  color: #007bff;
+  transition: all 0.15s;
+}
+
+.btn-pagina-num.activo {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.paginacion-info {
+  margin-left: 8px;
+  font-size: 13px;
+  color: #666;
+}

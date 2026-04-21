@@ -1,0 +1,228 @@
+.cupones-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.cupones-container h2 {
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.cupones-subtitulo {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+/* Formulario */
+.cupon-form-card {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 30px;
+}
+
+.cupon-form-card h3 {
+  margin: 0 0 20px;
+  font-size: 16px;
+  color: #343a40;
+}
+
+.cupon-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .cupon-form-grid { grid-template-columns: 1fr; }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px 13px;
+  border: 1px solid #dee2e6;
+  border-radius: 7px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+.form-group input:disabled {
+  background: #e9ecef;
+  cursor: not-allowed;
+  color: #6c757d;
+}
+
+.form-group .hint {
+  font-size: 11px;
+  color: #6c757d;
+  margin: 0;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 24px;
+}
+
+.form-check input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+}
+
+.form-check label {
+  font-size: 14px;
+  color: #343a40;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.cupon-form-acciones {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Mensaje */
+.mensaje {
+  padding: 12px 18px;
+  border-radius: 7px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.mensaje.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.mensaje.error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+/* Tabla */
+.cupones-tabla-wrapper { overflow-x: auto; }
+
+.cupones-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+.cupones-tabla th {
+  background: #f8f9fa;
+  padding: 11px 14px;
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6c757d;
+  font-weight: 600;
+  border-bottom: 1px solid #e9ecef;
+  white-space: nowrap;
+}
+
+.cupones-tabla td {
+  padding: 13px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #343a40;
+  vertical-align: middle;
+}
+
+.cupones-tabla tr:last-child td { border-bottom: none; }
+.cupones-tabla tr:hover td { background: #f8f9fa; }
+
+.codigo-cell {
+  font-family: monospace;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #1a1a2e;
+}
+
+.descuento-cell {
+  font-weight: 700;
+  color: #28a745;
+  white-space: nowrap;
+}
+
+.badge-activo {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge-activo.si  { background: #d4edda; color: #155724; }
+.badge-activo.no  { background: #f8d7da; color: #721c24; }
+
+.usos-cell { font-size: 13px; color: #495057; }
+.usos-agotados { color: #dc3545; font-weight: 600; }
+
+.fecha-cell { font-size: 13px; white-space: nowrap; }
+.fecha-vencida { color: #dc3545; }
+
+.acciones-cell { display: flex; gap: 7px; white-space: nowrap; }
+
+/* Botones */
+.btn-primary, .btn-secondary, .btn-editar, .btn-eliminar {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary { background: #007bff; color: white; flex: 1; }
+.btn-primary:hover { background: #0056b3; }
+.btn-primary:disabled { background: #6c757d; cursor: not-allowed; }
+
+.btn-secondary { background: #6c757d; color: white; }
+.btn-secondary:hover { background: #545b62; }
+
+.btn-editar { background: #ffc107; color: #212529; padding: 6px 12px; font-size: 13px; }
+.btn-editar:hover { background: #e0a800; }
+
+.btn-eliminar { background: #dc3545; color: white; padding: 6px 12px; font-size: 13px; }
+.btn-eliminar:hover { background: #c82333; }
+
+.cupones-conteo {
+  font-size: 13px;
+  color: #6c757d;
+  margin-bottom: 12px;
+}
+
+.sin-cupones {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+  font-style: italic;
+}

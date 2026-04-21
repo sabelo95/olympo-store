@@ -1,0 +1,172 @@
+.mispedidos-page {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 32px 16px;
+}
+
+.mispedidos-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.mispedidos-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.mispedidos-header button {
+  background: none;
+  border: none;
+  font-size: 15px;
+  color: #6c757d;
+  cursor: pointer;
+}
+
+.mispedidos-header h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #343a40;
+}
+
+.pedido-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+.pedido-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  gap: 12px;
+}
+
+.pedido-id-fecha {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pedido-id {
+  font-weight: 700;
+  font-size: 16px;
+  color: #343a40;
+}
+
+.pedido-fecha {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.pedido-estado {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.estado-PENDIENTE    { background: #fff3cd; color: #856404; }
+.estado-CONFIRMADO   { background: #cfe2ff; color: #0a58ca; }
+.estado-PREPARANDO   { background: #e2d9f3; color: #5a23a3; }
+.estado-ENVIADO      { background: #d1ecf1; color: #0c5460; }
+.estado-ENTREGADO    { background: #d4edda; color: #155724; }
+.estado-CANCELADO    { background: #f8d7da; color: #721c24; }
+
+.pedido-lineas {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pedido-linea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #495057;
+}
+
+.pedido-linea-nombre {
+  font-weight: 500;
+  color: #343a40;
+}
+
+.pedido-linea-detalle {
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+.pedido-linea-precio {
+  font-weight: 600;
+  color: #343a40;
+  white-space: nowrap;
+  margin-left: 12px;
+}
+
+.pedido-footer {
+  border-top: 1px solid #f0f0f0;
+  margin-top: 14px;
+  padding-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.pedido-direccion {
+  font-size: 13px;
+  color: #6c757d;
+  max-width: 60%;
+}
+
+.pedido-total {
+  font-size: 18px;
+  font-weight: 700;
+  color: #343a40;
+}
+
+.pedido-metodo {
+  font-size: 12px;
+  color: #6c757d;
+  text-align: right;
+}
+
+.sin-pedidos {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.sin-pedidos p { font-size: 16px; margin-bottom: 16px; }
+
+.btn-ir-tienda {
+  display: inline-block;
+  padding: 11px 24px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-ir-tienda:hover { background: #0056b3; }
+
+.mispedidos-loading {
+  text-align: center;
+  padding: 60px;
+  color: #6c757d;
+}

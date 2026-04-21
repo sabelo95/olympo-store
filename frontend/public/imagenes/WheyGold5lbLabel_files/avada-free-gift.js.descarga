@@ -1,0 +1,25 @@
+(function() {
+  try {
+    const scripts = [
+      {
+        baseUrl: 'https://static-fg.aov.ai/scripttag', // production
+        file: 'avada-free-gift-main.min.js'
+      },
+      {
+        baseUrl: 'https://static-utils.aov.ai',
+        file: 'aov-util.min.js'
+      }
+    ];
+
+    scripts.forEach(({baseUrl, file}) => {
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.async = true;
+      script.src = `${baseUrl}/${file}?v=${Date.now()}`;
+      const firstScript = document.getElementsByTagName('script')[0];
+      firstScript.parentNode.insertBefore(script, firstScript);
+    });
+  } catch (error) {
+    console.error(' ~ error:', error);
+  }
+})();

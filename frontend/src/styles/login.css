@@ -1,0 +1,183 @@
+/* ── Página de login ── */
+.login-page {
+  min-height: 100vh;
+  background: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.login-navbar {
+  background: #1a1a2e;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.login-navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.login-navbar-logo-nav {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.login-navbar-nombre {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.login-navbar-back {
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: color 0.2s;
+  font-family: inherit;
+}
+.login-navbar-back:hover { color: white; }
+
+/* ── Cuerpo central ── */
+.login-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.login-card {
+  background: white;
+  border-radius: 14px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.login-card-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.login-card-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 6px 0;
+}
+
+.login-card-header p {
+  font-size: 14px;
+  color: #888;
+  margin: 0;
+}
+
+/* ── Inputs ── */
+.login-input {
+  margin-bottom: 16px;
+}
+
+.login-input input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  background: #fafafa;
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+  font-family: inherit;
+}
+
+.login-input input:focus {
+  outline: none;
+  border-color: #1a1a2e;
+  background: white;
+}
+
+.login-input input::placeholder {
+  color: #bbb;
+}
+
+/* ── Botón ── */
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background: #e63946;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+  margin-top: 4px;
+}
+.login-button:hover:not(:disabled) { background: #c1121f; }
+.login-button:disabled { opacity: 0.65; cursor: not-allowed; }
+
+/* ── Divisor ── */
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 0;
+  color: #bbb;
+  font-size: 13px;
+}
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #eee;
+}
+
+/* ── Footer ── */
+.login-footer {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: #888;
+}
+
+.login-footer span {
+  color: #1a1a2e;
+  font-weight: 700;
+  cursor: pointer;
+}
+.login-footer span:hover { text-decoration: underline; }
+
+.login-footer-skip {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #aaa;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+}
+.login-footer-skip:hover { color: #666; }

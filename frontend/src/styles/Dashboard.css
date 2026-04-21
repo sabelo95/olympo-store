@@ -1,0 +1,296 @@
+.dashboard {
+  padding: 24px;
+  background-color: #f5f6fa;
+  min-height: 100vh;
+}
+
+.dashboard h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 24px;
+}
+
+/* KPI CARDS */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.kpi-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-left: 4px solid transparent;
+}
+
+.kpi-card.azul   { border-left-color: #4361ee; }
+.kpi-card.verde  { border-left-color: #2ecc71; }
+.kpi-card.naranja{ border-left-color: #f39c12; }
+.kpi-card.rojo   { border-left-color: #e74c3c; }
+.kpi-card.morado { border-left-color: #9b59b6; }
+
+.kpi-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  font-weight: 600;
+}
+
+.kpi-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  line-height: 1;
+}
+
+/* GRID DE SECCIONES */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.dashboard-card h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* ESTADO BADGES */
+.estado-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.estado-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.estado-nombre {
+  font-size: 0.85rem;
+  color: #555;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.estado-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 20px;
+}
+
+.badge-PENDIENTE    { background: #fff3cd; color: #856404; }
+.badge-PROCESANDO   { background: #cfe2ff; color: #084298; }
+.badge-ENVIADO      { background: #d1ecf1; color: #0c5460; }
+.badge-COMPLETADO   { background: #d4edda; color: #155724; }
+.badge-CANCELADO    { background: #f8d7da; color: #721c24; }
+.badge-default      { background: #e2e3e5; color: #383d41; }
+
+/* TOP PRODUCTOS */
+.top-productos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.top-producto-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-producto-rank {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #4361ee;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.top-producto-info {
+  flex: 1;
+}
+
+.top-producto-nombre {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.top-producto-bar-wrap {
+  height: 5px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  margin-top: 4px;
+}
+
+.top-producto-bar {
+  height: 5px;
+  background: #4361ee;
+  border-radius: 3px;
+}
+
+.top-producto-cantidad {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #4361ee;
+  flex-shrink: 0;
+}
+
+/* PEDIDOS RECIENTES */
+.pedidos-table-wrap {
+  overflow-x: auto;
+}
+
+.pedidos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+
+.pedidos-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-weight: 600;
+  color: #888;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.pedidos-table td {
+  padding: 10px 10px;
+  border-bottom: 1px solid #f9f9f9;
+  color: #333;
+}
+
+.pedidos-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* VENTAS POR PERÍODO */
+.periodo-form {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.periodo-form label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.periodo-form input[type="date"] {
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.periodo-form input[type="date"]:focus {
+  border-color: #4361ee;
+}
+
+.btn-consultar {
+  padding: 8px 18px;
+  background: #4361ee;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-consultar:hover {
+  background: #3451d1;
+}
+
+.periodo-result {
+  display: flex;
+  gap: 20px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.periodo-kpi {
+  flex: 1;
+  min-width: 120px;
+  background: #f5f6fa;
+  border-radius: 10px;
+  padding: 14px 18px;
+  text-align: center;
+}
+
+.periodo-kpi .kpi-label {
+  font-size: 0.72rem;
+  margin-bottom: 6px;
+}
+
+.periodo-kpi .kpi-value {
+  font-size: 1.4rem;
+}
+
+/* LOADING / ERROR */
+.loading-text {
+  color: #888;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.error-text {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}

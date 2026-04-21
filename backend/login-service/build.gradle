@@ -1,0 +1,69 @@
+plugins {
+ id 'java'
+ id 'org.springframework.boot' version '3.3.4' // bajamos de 3.5.4 a 3.3.4
+ id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com'
+version = '0.0.1-SNAPSHOT'
+
+java {
+ toolchain {
+  languageVersion = JavaLanguageVersion.of(17)
+ }
+}
+
+// Spring Cloud compatible con Spring Boot 3.3.x
+ext {
+ springCloudVersion = '2023.0.1'
+}
+
+repositories {
+ mavenCentral()
+}
+
+configurations {
+ compileOnly {
+  extendsFrom annotationProcessor
+ }
+ runtimeOnly {
+  extendsFrom implementation
+ }
+}
+
+dependencyManagement {
+ imports {
+  mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+ }
+}
+
+dependencies {
+ implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+ implementation 'org.springframework.boot:spring-boot-starter-security'
+ implementation 'org.springframework.boot:spring-boot-starter-web'
+ implementation 'org.postgresql:postgresql:42.7.3'
+
+ // JWT
+ implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+ runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+ runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+ // Lombok
+ compileOnly 'org.projectlombok:lombok'
+ annotationProcessor 'org.projectlombok:lombok'
+
+ // Swagger
+ implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+ 
+ // Tests
+ testImplementation 'org.springframework.boot:spring-boot-starter-test'
+ testImplementation 'org.springframework.security:spring-security-test'
+ testImplementation 'org.mockito:mockito-core'
+ testImplementation 'org.mockito:mockito-junit-jupiter'
+ testImplementation 'com.h2database:h2'
+ testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+ useJUnitPlatform()
+}

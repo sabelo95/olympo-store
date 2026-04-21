@@ -1,0 +1,130 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # ============= RUTAS PARA API-DOCS (SWAGGER) =============
+        - id: auth-api-docs
+          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8082
+          predicates:
+            - Path=/auth-api-docs
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: productos-api-docs
+          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8083
+          predicates:
+            - Path=/productos-api-docs
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: ordenes-api-docs
+          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8084
+          predicates:
+            - Path=/ordenes-api-docs
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: notificaciones-api-docs
+          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8085
+          predicates:
+            - Path=/notificaciones-api-docs
+          filters:
+            - SetPath=/v3/api-docs
+
+
+        # ============= AUTH SERVICE =============
+        - id: auth-service
+          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8082
+          predicates:
+            - Path=/auth/**
+
+
+        # ============= PRODUCTOS SERVICE =============
+        - id: productos-service
+          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8083
+          predicates:
+            - Path=/productos/**
+
+
+        # ============= CATEGORIAS SERVICE =============
+        - id: categorias-service
+          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8083
+          predicates:
+            - Path=/categorias/**
+
+
+        # ============= MARCAS SERVICE =============
+        - id: marcas-service
+          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8083
+          predicates:
+            - Path=/marcas/**
+
+
+        # ============= REPORTE SERVICE =============
+        - id: reporte-service
+          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8083
+          predicates:
+            - Path=/reporte/**
+
+
+        # ============= ORDENES/COMPRAS SERVICE =============
+        - id: ordenes-service
+          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8084
+          predicates:
+            - Path=/api/carritos/**,/api/clientes/**,/api/pedidos/**,/api/reportes/**,/api/health/**
+
+
+        # ============= NOTIFICACIONES SERVICE =============
+        - id: notificaciones-service
+          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8085
+          predicates:
+            - Path=/notificaciones/**
+
+
+      # Configuración global CORS
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: false
+
+      # Configuración para forward de headers
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+
+# ============= CONFIGURACIÓN DE SWAGGER UI EN EL GATEWAY =============
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    urls:
+      - name: Auth Service
+        url: /auth-api-docs
+      - name: Productos Service (incluye Categorías, Marcas y Reportes)
+        url: /productos-api-docs
+      - name: Ordenes Service
+        url: /ordenes-api-docs
+      - name: Notificaciones Service
+        url: /notificaciones-api-docs
+
+
+# ============= CONFIGURACIÓN DEL SERVIDOR =============
+server:
+  port: 8081
+  forward-headers-strategy: framework
+
+
+

@@ -1,0 +1,1117 @@
+function adjustHexWithAlpha(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  let currentAlpha = hex.length === 9 ? parseInt(hex.slice(7, 9), 16) : 255;
+
+  const newAlpha = Math.round(alpha * currentAlpha);
+
+  const adjustedHex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}${newAlpha.toString(16).padStart(2, "0").toUpperCase()}`;
+
+  return adjustedHex;
+}
+
+function isArraysEqual(arr1, arr2) {
+  if (arr1.length !== arr2.length) return false;
+
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i] !== arr2[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function anotherFormatMoney(amount) {
+  const moneyFormat = window.anotherPriceFormat;
+
+  const formatPattern = /{{\s*(\w+)\s*}}/;
+  const formatType = moneyFormat.match(formatPattern)?.[1] || "amount";
+
+  const formatWithDelimiters = (
+    num,
+    decimalPlaces = 2,
+    thousandsSeparator = ",",
+    decimalSeparator = ".",
+  ) => {
+    if (typeof num === "string") num = Number(num);
+    if (isNaN(num) || num == null) return "0";
+
+    num = num.toFixed(decimalPlaces);
+    const [integerPart, decimalPart] = num.split(".");
+
+    return (
+      integerPart.replace(
+        /(\d)(?=(\d{3})+(?!\d))/g,
+        `$1${thousandsSeparator}`,
+      ) + (decimalPart ? `${decimalSeparator}${decimalPart}` : "")
+    );
+  };
+
+  const formatMapping = {
+    amount: formatWithDelimiters(amount, 2),
+    amount_no_decimals: formatWithDelimiters(amount, 0, " "),
+    amount_no_decimals_with_space_separator: formatWithDelimiters(
+      amount,
+      0,
+      " ",
+    ),
+    amount_with_comma_separator: formatWithDelimiters(amount, 2, ".", ","),
+    amount_no_decimals_with_comma_separator: formatWithDelimiters(
+      amount,
+      0,
+      ".",
+      ",",
+    ),
+    amount_with_apostrophe_separator: formatWithDelimiters(amount, 2, "'", "."),
+    amount_with_space_separator: formatWithDelimiters(amount, 2, " ", ","),
+    amount_with_period_and_space_separator: formatWithDelimiters(
+      amount,
+      2,
+      " ",
+      ".",
+    ),
+  };
+
+  return moneyFormat.replace(
+    formatPattern,
+    formatMapping[formatType] || formatMapping.amount,
+  );
+}
+
+function roundPrice(price, roundingType) {
+  let result;
+
+  const roundingMap = {
+    ".99": (price) => Math.floor(price) + 0.99,
+    ".95": (price) => Math.floor(price) + 0.95,
+    ".90": (price) => Math.floor(price) + 0.9,
+    ".x9": (price) => Math.floor(price * 10) / 10 - 0.01,
+    ".x0": (price) => Math.floor(price * 10) / 10,
+    ".00": (price) => Math.floor(price),
+  };
+  result = roundingMap[roundingType]?.(price) ?? price;
+
+  const resultDecrease = result - 1;
+  const resultIncrease = result + 1;
+
+  if (Math.abs(price - resultDecrease) < Math.abs(result - price)) {
+    result = resultDecrease;
+  } else if (Math.abs(price - resultIncrease) < Math.abs(result - price)) {
+    result = resultIncrease;
+  }
+
+  return result.toFixed(2);
+}
+
+function convertVariantsToJson(variants) {
+  return JSON.stringify(variants, (key, value) => {
+    if (value instanceof Map) {
+      const array = [];
+      value.forEach((v, k) => (array[k] = v));
+      return array;
+    }
+    return value;
+  });
+}
+
+function getAddToCartForm() {
+  const formSelectors = [
+    'form[data-type="add-to-cart-form"]',
+    ".product-form",
+    ".productForm",
+    ".product-form__buy-buttons .shopify-product-form",
+    ".product-info__buy-buttons .shopify-product-form",
+    ".shopify-product-form",
+    "#addToCartFormId1",
+    "#AddToCartForm--product-template",
+    ".product-form-product-template",
+    ".product-form.hidedropdown",
+    ".addToCartForm",
+    ".product-single__meta .product-single__meta-info .product-single__form",
+    ".ProductForm",
+    ".product-single__form",
+    ".prod_form",
+    "#addToCartForm-product-template-optimised",
+    ".shg-product-atc-btn-wrapper",
+  ];
+
+  for (const selector of formSelectors) {
+    const formElement = document.querySelector(selector);
+    if (formElement) {
+      return formElement;
+    }
+  }
+  return null;
+}
+
+const anotherRadioButton = "another-radio-button";
+
+class AnotherRadioButton extends HTMLElement {
+  connectedCallback() {
+    this.config = window.anotherOffers[this.getAttribute("configIndex")];
+
+    this.render();
+  }
+
+  static get observedAttributes() {
+    return ["checked"];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === "checked" && oldValue !== newValue) {
+      this.onCheckedChange(newValue);
+    }
+  }
+
+  render() {
+    const container = document.createElement("div");
+
+    this.radioButton = document.createElement("input");
+    this.radioButton.type = "radio";
+    this.radioButton.defaultChecked = this.getAttribute("checked") === "true";
+    this.radioButton.style.display = "none";
+
+    this.span = document.createElement("span");
+    this.span.style.width = "20px";
+    this.span.style.height = "20px";
+    this.span.style.borderRadius = "50%";
+    this.span.style.border =
+      this.getAttribute("checked") === "true"
+        ? `2px solid ${this.config.borderColor}`
+        : `2px solid ${adjustHexWithAlpha(this.config.borderColor, 0.3)}`;
+    this.span.style.display = "inline-block";
+    this.span.style.position = "relative";
+    this.span.style.verticalAlign = "middle";
+    this.span.style.cursor = "pointer";
+
+    this.innerSpan = document.createElement("span");
+    this.innerSpan.style.display = "block";
+    this.innerSpan.style.width = "12px";
+    this.innerSpan.style.height = "12px";
+    this.innerSpan.style.borderRadius = "50%";
+    this.innerSpan.style.backgroundColor = this.config.radioColor;
+    this.innerSpan.style.position = "absolute";
+    this.innerSpan.style.top = "50%";
+    this.innerSpan.style.left = "50%";
+    this.innerSpan.style.transform = "translate(-50%, -50%)";
+    this.innerSpan.style.opacity =
+      this.getAttribute("checked") === "true" ? "1" : "0";
+    this.innerSpan.style.transition = "opacity 0.2s ease";
+
+    this.span.appendChild(this.innerSpan);
+    container.appendChild(this.radioButton);
+    container.appendChild(this.span);
+
+    this.appendChild(container);
+  }
+
+  onCheckedChange(checked) {
+    if (this.innerSpan) {
+      this.innerSpan.style.opacity = checked === "true" ? "1" : "0";
+    }
+
+    if (this.span) {
+      this.span.style.border =
+        checked === "true"
+          ? `2px solid ${this.config.borderColor}`
+          : `2px solid ${adjustHexWithAlpha(this.config.borderColor, 0.3)}`;
+    }
+
+    if (this.radioButton) {
+      this.radioButton.checked = checked === "true";
+    }
+  }
+}
+
+customElements.define(anotherRadioButton, AnotherRadioButton);
+
+const anotherTitleSubtitle = "another-title-subtitle";
+
+class AnotherTitleSubtitle extends HTMLElement {
+  connectedCallback() {
+    this.config = window.anotherOffers[this.getAttribute("configIndex")];
+    this.tier = this.config.offerTiers[this.getAttribute("tierIndex")];
+    this.isSelected = this.getAttribute("selected") === "true";
+
+    this.titleView = document.createElement("div");
+    this.appendChild(this.titleView);
+    this.subtitle = document.createElement("div");
+    this.appendChild(this.subtitle);
+
+    this.render();
+  }
+
+  static get observedAttributes() {
+    return ["selected"];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === "selected" && oldValue !== newValue) {
+      this.isSelected = newValue === "true";
+      this.refreshTitleSubtitleColors();
+    }
+  }
+
+  render() {
+    this.refreshTitleSubtitleColors();
+    this.titleView.style.fontSize = `${this.config.titleFontSize}px`;
+    this.titleView.style.fontWeight = this.config.titleFontWeight;
+    this.titleView.style.lineHeight = "normal";
+    this.titleView.textContent = this.tier.title;
+
+    this.subtitle.style.fontSize = `${this.config.subtitleFontSize}px`;
+    this.subtitle.style.fontWeight = this.config.subtitleFontWeight;
+    this.subtitle.style.lineHeight = "normal";
+    this.subtitle.textContent = this.tier.subtitle;
+  }
+
+  refreshTitleSubtitleColors() {
+    if (!this.config) return;
+    const selectedTitleColorCode =
+      this.config.selectedTitleColor || this.config.titleColor;
+    const selectedSubtitleColorCode =
+      this.config.selectedSubtitleColor || this.config.subtitleColor;
+
+    this.titleView.style.color = this.isSelected
+      ? selectedTitleColorCode
+      : this.config.titleColor;
+
+    this.subtitle.style.color = this.isSelected
+      ? selectedSubtitleColorCode
+      : this.config.subtitleColor;
+  }
+}
+
+customElements.define(anotherTitleSubtitle, AnotherTitleSubtitle);
+
+const anotherTierBadge = "another-tier-badge";
+
+class AnotherTierBadge extends HTMLElement {
+  connectedCallback() {
+    this.config = window.anotherOffers[this.getAttribute("configIndex")];
+    this.tier = this.config.offerTiers[this.getAttribute("tierIndex")];
+
+    this.render();
+  }
+
+  render() {
+    this.style.position = "absolute";
+    this.style.top = "-10px";
+    this.style.height = "20px";
+    const badgeAlignment = this.config.badgeAlignment;
+    this.style.right =
+      badgeAlignment === "right"
+        ? "8px"
+        : badgeAlignment === "center"
+          ? "0px"
+          : undefined;
+    this.style.left =
+      badgeAlignment === "left"
+        ? "8px"
+        : badgeAlignment === "center"
+          ? "0px"
+          : undefined;
+    this.style.margin = badgeAlignment === "center" ? "auto" : undefined;
+    this.style.width = "fit-content";
+    this.style.padding = "0 8px";
+    this.style.borderRadius = "8px";
+    this.style.backgroundColor = this.tier.badgeColor;
+    this.style.color = this.tier.badgeTextColor;
+    this.style.fontSize = "13px";
+    this.style.fontWeight = "bold";
+    this.style.display = "flex";
+    this.style.alignItems = "center";
+    this.textContent = this.tier.badgeText;
+  }
+}
+
+customElements.define(anotherTierBadge, AnotherTierBadge);
+
+const anotherVariants = "another-variants";
+
+class AnotherVariants extends HTMLElement {
+  connectedCallback() {
+    this.config = window.anotherOffers[this.getAttribute("configIndex")];
+    this.tier = this.config.offerTiers[this.getAttribute("tierIndex")];
+    this.product = window.anotherProduct;
+    this.isSelected = this.getAttribute("selected") === "true";
+    this.selectionElements = new Map();
+    this.render();
+    this.onVariantSelected();
+
+    if (this.selectionElements.size === 0) {
+      const originalReplaceState = history.replaceState;
+      const onQueryParametersChanged = this.onQueryParametersChanged.bind(this);
+      history.replaceState = function () {
+        originalReplaceState.apply(this, arguments);
+        onQueryParametersChanged();
+      };
+    }
+  }
+
+  static get observedAttributes() {
+    return ["selected"];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (!this.isConnected) return;
+    if (name === "selected") {
+      this.isSelected = newValue === "true";
+      const shouldBeVisible = this.shouldBeVisible();
+      this.setVisibility(this.isSelected && shouldBeVisible);
+    }
+  }
+
+  render() {
+    const isVisible = this.shouldBeVisible();
+    this.setVisibility(isVisible && this.isSelected);
+    if (!isVisible) return;
+
+    this.style.gridAutoColumns = "min-content";
+    this.style.gap = "6px";
+
+    const titleColor = this.config.selectedTitleColor
+      ? this.config.selectedTitleColor
+      : this.config.titleColor;
+    const subtitleColor = this.config.selectedSubtitleColor
+      ? this.config.selectedSubtitleColor
+      : this.config.subtitleColor;
+
+    this.product.options.forEach((option, index) => {
+      const element = document.createElement("div");
+      element.style.gridRow = 1;
+      element.style.gridColumn = index + 2;
+      element.style.justifySelf = "center";
+      element.style.fontSize = "12px";
+      element.style.color = subtitleColor;
+      element.textContent = option;
+      this.appendChild(element);
+    });
+
+    for (let index = 0; index < this.tier.quantity + 1; index++) {
+      const label = document.createElement("div");
+      label.style.gridRow = index + 1;
+      label.style.fontSize = "12px";
+      label.style.color = titleColor;
+      label.textContent = index > 0 ? `#${index}` : "";
+      this.appendChild(label);
+
+      if (index > 0) {
+        const selectors = new Map();
+        this.product.options.forEach((_option, optionIndex) => {
+          const select = document.createElement("select");
+          selectors.set(optionIndex, select);
+          select.style.gridRow = index + 1;
+          select.style.gridColumn = optionIndex + 2;
+          select.addEventListener("change", () => {
+            this.onVariantSelected();
+          });
+
+          const options = this.product.variants.map(
+            (variant) => variant.options[optionIndex],
+          );
+          const uniqueOptions = [...new Set(options)];
+          uniqueOptions.forEach((variant) => {
+            const optionElement = document.createElement("option");
+            optionElement.value = variant;
+            optionElement.textContent = variant;
+            select.appendChild(optionElement);
+          });
+
+          this.appendChild(select);
+        });
+        this.selectionElements.set(index - 1, selectors);
+      }
+    }
+  }
+
+  setVisibility(isVisible) {
+    this.style.display = isVisible ? "grid" : "none";
+  }
+
+  shouldBeVisible() {
+    if (!this.config.showProductVariants) return false;
+    if (this.tier.quantity < 2 && this.config.showThemeVariantPicker)
+      return false;
+    if (this.product.variants.length < 2) return false;
+    return true;
+  }
+
+  onVariantSelected() {
+    const selectedVariants = new Map();
+    if (this.selectionElements.size > 0) {
+      this.selectionElements.forEach((select, index) => {
+        const values = new Map();
+        select.forEach((element, optionIndex) => {
+          values.set(optionIndex, element.value);
+        });
+        selectedVariants.set(index, values);
+      });
+    } else {
+      for (let index = 0; index < this.tier.quantity; index++) {
+        selectedVariants.set(index, this.product.variants[0].options);
+      }
+    }
+
+    this.dispatchEvent(
+      new CustomEvent("another:selected_variants", {
+        bubbles: true,
+        detail: { selectedVariants },
+      }),
+    );
+  }
+
+  onQueryParametersChanged() {
+    if (this.selectionElements.size !== 0) return;
+    const variantId = new URLSearchParams(window.location.search).get(
+      "variant",
+    );
+    const variant = this.product.variants.find(
+      (variant) => variant.id.toString() === variantId,
+    );
+    const selectedVariants = new Map();
+    for (let index = 0; index < this.tier.quantity; index++) {
+      selectedVariants.set(index, variant.options);
+    }
+    this.dispatchEvent(
+      new CustomEvent("another:selected_variants", {
+        bubbles: true,
+        detail: { selectedVariants },
+      }),
+    );
+  }
+}
+
+customElements.define(anotherVariants, AnotherVariants);
+
+const anotherPrice = "another-price";
+
+class AnotherPrice extends HTMLElement {
+  connectedCallback() {
+    this.config = window.anotherOffers[this.getAttribute("configIndex")];
+    this.tier = this.config.offerTiers[this.getAttribute("tierIndex")];
+    this.product = window.anotherProduct;
+    this.isSelected = this.getAttribute("selected") === "true";
+
+    this.price = document.createElement("div");
+    this.appendChild(this.price);
+    this.regularPrice = document.createElement("div");
+    this.appendChild(this.regularPrice);
+
+    this.render();
+  }
+
+  disconnectedCallback() {}
+
+  static get observedAttributes() {
+    return ["selected-variants", "selected"];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === "selected-variants" && oldValue !== newValue) {
+      this.selectedVariants = JSON.parse(newValue);
+      this.updatePrice();
+    }
+    if (name === "selected" && oldValue !== newValue) {
+      this.isSelected = newValue === "true";
+      this.refreshPriceColor();
+    }
+  }
+
+  render() {
+    this.style.textAlign = "end";
+
+    this.price.style.fontWeight = this.config.priceFontWeight;
+    this.price.style.fontSize = `${this.config.priceFontSize}px`;
+    this.price.style.lineHeight = "normal";
+    this.refreshPriceColor();
+
+    this.regularPrice.style.fontWeight = this.config.regularPriceFontWeight;
+    this.regularPrice.style.fontSize = `${this.config.regularPriceFontSize}px`;
+    this.regularPrice.style.lineHeight = "normal";
+    this.regularPrice.style.color = this.config.regularPriceColor;
+  }
+
+  updatePrice() {
+    const discountPrice = this.calculatePrice();
+    const regularPrice = this.calculateRegularPrice();
+    this.price.innerHTML = anotherFormatMoney(discountPrice);
+    if (discountPrice !== regularPrice) {
+      this.regularPrice.innerHTML = `<s>${anotherFormatMoney(regularPrice)}</s>`;
+      this.regularPrice.style.display = "block";
+    } else {
+      this.regularPrice.innerHTML = null;
+      this.regularPrice.style.display = "none";
+    }
+  }
+
+  calculatePrice() {
+    let fullPrice = 0;
+    this.selectedVariants.forEach((itemOptions) => {
+      const variant = this.product.variants.find((variant) => {
+        return isArraysEqual(variant.options, itemOptions);
+      });
+      if (variant) {
+        fullPrice += variant.price;
+      }
+    });
+
+    fullPrice = this.config.showPricePerItem
+      ? fullPrice / this.tier.quantity
+      : fullPrice;
+
+    let discountedPrice = 0;
+    if (this.tier.discountType === "percentage") {
+      discountedPrice = fullPrice * (1 - this.tier.discountAmount / 100);
+    } else if (this.tier.discountType === "fixed") {
+      discountedPrice =
+        fullPrice - this.tier.discountAmount * 100 * this.tier.quantity;
+    } else {
+      discountedPrice = fullPrice;
+    }
+
+    return this.config.priceRounding && this.tier.discountType !== "default"
+      ? roundPrice(discountedPrice / 100, this.config.priceRoundingType)
+      : discountedPrice / 100;
+  }
+
+  calculateRegularPrice() {
+    let fullPrice = 0;
+    this.selectedVariants.forEach((itemOptions) => {
+      const variant = this.product.variants.find((variant) => {
+        return isArraysEqual(variant.options, itemOptions);
+      });
+      if (variant) {
+        fullPrice += this.config.useCompareAtPrices
+          ? Math.max(variant.compare_at_price, variant.price)
+          : variant.price;
+      }
+    });
+
+    if (this.config.showPricePerItem) {
+      return fullPrice / this.tier.quantity / 100;
+    } else {
+      return fullPrice / 100;
+    }
+  }
+
+  refreshPriceColor() {
+    if (!this.config) return;
+    const selectedPriceColorCode =
+      this.config.selectedPriceColor || this.config.priceColor;
+
+    this.price.style.color = this.isSelected
+      ? selectedPriceColorCode
+      : this.config.priceColor;
+  }
+}
+
+customElements.define(anotherPrice, AnotherPrice);
+
+const anotherTierCard = "another-tier-card";
+
+const anotherTierCardClickEventName = "another-offer-selected";
+
+class AnotherTierCard extends HTMLElement {
+  connectedCallback() {
+    this.config = window.anotherOffers[this.getAttribute("configIndex")];
+    this.tier = this.config.offerTiers[this.getAttribute("tierIndex")];
+
+    this.render();
+    this.addEventListener("click", this.handleClick);
+    document.addEventListener(
+      anotherTierCardClickEventName,
+      this.handleOtherRadioSelected.bind(this),
+    );
+    if (this.tier.selectedByDefault) this.notifyParentTierSelected();
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener("click", this.handleClick);
+    document.removeEventListener(
+      anotherTierCardClickEventName,
+      this.handleOtherRadioSelected.bind(this),
+    );
+  }
+
+  render() {
+    const isSelected = this.tier.selectedByDefault;
+
+    const container = document.createElement("div");
+    container.classList.add("another-tier-card");
+    if (isSelected) container.classList.add("selected");
+
+    const styles = document.createElement("style");
+    styles.textContent = `
+      .another-tier-card {
+        border: 2px solid ${adjustHexWithAlpha(this.config.borderColor, 0.3)};
+        background-color: ${this.config.backgroundColor};
+      }
+      .another-tier-card:hover {
+        border: 2px solid ${adjustHexWithAlpha(this.config.borderColor, 0.5)};
+      }
+      .another-tier-card.selected {
+        border: 2px solid ${this.config.borderColor};
+        background-color: ${this.config.selectedBackgroundColor};
+      }
+    `;
+    container.appendChild(styles);
+
+    container.style.display = "flex";
+    container.style.flexDirection = "column";
+    container.style.borderRadius = `${this.config.borderRadius}px`;
+    container.style.cursor = "pointer";
+    container.style.padding = "16px";
+    container.style.gap = "8px";
+    container.style.position = "relative";
+
+    if (this.tier.badgeText) {
+      const badge = document.createElement(anotherTierBadge);
+      badge.setAttribute("configIndex", this.getAttribute("configIndex"));
+      badge.setAttribute("tierIndex", this.getAttribute("tierIndex"));
+      container.appendChild(badge);
+    }
+
+    const contentContainer = document.createElement("div");
+    contentContainer.style.display = "flex";
+    contentContainer.style.flexDirection = "row";
+    contentContainer.style.justifyContent = "space-between";
+    contentContainer.style.alignItems = "center";
+
+    const leftContent = document.createElement("div");
+    leftContent.style.display = "flex";
+    leftContent.style.alignItems = "center";
+    leftContent.style.gap = "16px";
+
+    if (!this.tier.image) {
+      const radioButton = document.createElement(anotherRadioButton);
+      radioButton.classList.add("another-tier-card-radio-button");
+      radioButton.setAttribute("configIndex", this.getAttribute("configIndex"));
+      radioButton.setAttribute("checked", isSelected);
+      leftContent.appendChild(radioButton);
+    } else {
+      const image = document.createElement("img");
+      image.src = this.tier.image.url;
+      image.alt = "";
+      image.style.width = `${this.tier.image.size}px`;
+      image.style.height = `${this.tier.image.size}px`;
+      image.style.borderRadius = `${this.tier.image.cornerRadius}px`;
+      leftContent.appendChild(image);
+    }
+
+    this.titleSubtitle = document.createElement(anotherTitleSubtitle);
+    this.titleSubtitle.setAttribute(
+      "configIndex",
+      this.getAttribute("configIndex"),
+    );
+    this.titleSubtitle.setAttribute(
+      "tierIndex",
+      this.getAttribute("tierIndex"),
+    );
+    this.titleSubtitle.setAttribute("selected", isSelected);
+    leftContent.appendChild(this.titleSubtitle);
+    contentContainer.appendChild(leftContent);
+
+    this.priceView = document.createElement(anotherPrice);
+    this.priceView.setAttribute(
+      "configIndex",
+      this.getAttribute("configIndex"),
+    );
+    this.priceView.setAttribute("tierIndex", this.getAttribute("tierIndex"));
+    this.priceView.setAttribute("selected", isSelected);
+    contentContainer.appendChild(this.priceView);
+
+    container.appendChild(contentContainer);
+
+    this.variants = document.createElement(anotherVariants);
+    this.variants.setAttribute("configIndex", this.getAttribute("configIndex"));
+    this.variants.setAttribute("tierIndex", this.getAttribute("tierIndex"));
+    this.variants.setAttribute("selected", isSelected);
+    this.variants.addEventListener("another:selected_variants", (event) => {
+      this.onVariantSelected(event.detail.selectedVariants);
+    });
+    container.appendChild(this.variants);
+
+    this.appendChild(container);
+  }
+
+  handleClick() {
+    const event = new CustomEvent(anotherTierCardClickEventName, {
+      bubbles: true,
+      detail: { id: this.tier.id, selectedElement: this },
+    });
+
+    document.dispatchEvent(event);
+    this.notifyParentTierSelected();
+
+    this.setSelected(true);
+  }
+
+  setSelected(selected) {
+    this.querySelector(".another-tier-card").classList.toggle(
+      "selected",
+      selected,
+    );
+
+    const radioButton = this.querySelector(".another-tier-card-radio-button");
+    if (radioButton) {
+      radioButton.setAttribute("checked", selected);
+    }
+
+    this.variants.setAttribute("selected", selected);
+    this.titleSubtitle.setAttribute("selected", selected);
+    this.priceView.setAttribute("selected", selected);
+  }
+
+  handleOtherRadioSelected(event) {
+    const { id, selectedElement } = event.detail;
+
+    if (selectedElement !== this) {
+      this.setSelected(this.tier.id === id);
+    }
+  }
+
+  onVariantSelected(selectedVariants) {
+    this.selectedVariants = selectedVariants;
+    const json = convertVariantsToJson(this.selectedVariants);
+    this.priceView.setAttribute("selected-variants", json);
+    this.dispatchEvent(
+      new CustomEvent("another:variant_selected", {
+        bubbles: true,
+        detail: {
+          id: this.tier.id,
+          selectedVariants,
+        },
+      }),
+    );
+  }
+
+  notifyParentTierSelected() {
+    this.dispatchEvent(
+      new CustomEvent("another:tier_selected", {
+        bubbles: true,
+        detail: { id: this.tier.id },
+      }),
+    );
+  }
+}
+
+customElements.define(anotherTierCard, AnotherTierCard);
+
+const anotherOutOfStockMessage = "another-out-of-stock-message";
+
+class AnotherOutOfStockMessage extends HTMLElement {
+  connectedCallback() {
+    this.config = window.anotherOffers[this.getAttribute("configIndex")];
+    if (!this.config.showOutOfStock) return;
+
+    this.render();
+  }
+
+  static get observedAttributes() {
+    return ["selected-variants"];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (
+      name === "selected-variants" &&
+      oldValue !== newValue &&
+      this.config.showOutOfStock
+    ) {
+      if (newValue === "undefined") return;
+      this.selectedVariants = JSON.parse(newValue);
+      this.setVisibility(this.shouldBeVisible());
+    }
+  }
+
+  render() {
+    this.style.background = "#ff000015";
+    this.style.padding = "8px 16px 8px 16px";
+    this.style.borderRadius = "8px";
+    this.style.color = "#ff0000";
+    this.style.fontWeight = 600;
+    this.style.fontSize = "14px";
+    this.style.textAlign = "center";
+    this.style.lineHeight = "1.5";
+
+    this.textContent = this.config.outOfStockMessage;
+
+    this.setVisibility(false);
+  }
+
+  shouldBeVisible() {
+    const productCount = new Map();
+    this.selectedVariants.forEach((item) => {
+      const variantKey = item.join(",");
+      productCount.set(variantKey, (productCount.get(variantKey) || 0) + 1);
+    });
+
+    let outOfStock = false;
+    productCount.forEach((count, key) => {
+      const productInventory = window.anotherProductVariantQuantities.find(
+        (variant) => {
+          let variantKey = variant.options.join(",");
+          return variantKey === key;
+        },
+      );
+
+      if (!productInventory) return;
+      if (productInventory.managed && productInventory.quantity < count) {
+        outOfStock = true;
+      }
+    });
+    return outOfStock;
+  }
+
+  setVisibility(visible) {
+    this.style.display = visible ? "block" : "none";
+  }
+}
+
+customElements.define(anotherOutOfStockMessage, AnotherOutOfStockMessage);
+
+const anotherContainer = "another-container";
+
+class AnotherContainer extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+  }
+
+  connectedCallback() {
+    this.variants = new Map();
+    this.selectedTierId = "";
+    this.configIndex = this.getAttribute("configIndex");
+    this.config = window.anotherOffers[this.configIndex];
+
+    this.form = getAddToCartForm();
+
+    this.render();
+  }
+
+  render() {
+    const container = document.createElement("div");
+    container.style.marginBottom = "16px";
+    container.style.display = "flex";
+    container.style.flexDirection = "column";
+    container.style.gap = "12px";
+
+    const header = document.createElement("div");
+    header.style.textAlign = "center";
+    header.style.fontSize = this.config.headerFontSize;
+    header.style.fontWeight = this.config.headerFontWeight;
+    header.style.color = this.config.headerColor;
+    header.textContent = this.config.header;
+    container.appendChild(header);
+
+    this.config.offerTiers.forEach((_tier, index) => {
+      const tierCard = document.createElement(anotherTierCard);
+      tierCard.setAttribute("configIndex", this.configIndex);
+      tierCard.setAttribute("tierIndex", index);
+      tierCard.addEventListener("another:variant_selected", (event) => {
+        const { id, selectedVariants } = event.detail;
+        this.updateVariant(id, selectedVariants);
+      });
+      tierCard.addEventListener("another:tier_selected", (event) => {
+        this.onTierSelected(event.detail.id);
+      });
+      container.appendChild(tierCard);
+    });
+
+    this.outOfStockMessage = document.createElement(anotherOutOfStockMessage);
+    this.outOfStockMessage.setAttribute("configIndex", this.configIndex);
+    container.appendChild(this.outOfStockMessage);
+
+    this.shadowRoot.appendChild(container);
+  }
+
+  updateVariant(id, variant) {
+    this.variants.set(id, variant);
+    this.updateOutOfStock();
+    this.onSelectedVariantsChange();
+  }
+
+  onTierSelected(id) {
+    this.selectedTierId = id;
+    this.updateOutOfStock();
+    this.onSelectedVariantsChange();
+  }
+
+  updateOutOfStock() {
+    const json = convertVariantsToJson(this.variants.get(this.selectedTierId));
+    this.outOfStockMessage.setAttribute("selected-variants", json);
+  }
+
+  onSelectedVariantsChange() {
+    const selectedVariants = this.variants.get(this.selectedTierId);
+    if (!selectedVariants) return;
+
+    this.form
+      .querySelectorAll(".another_form_input")
+      .forEach((input) => input.remove());
+    this.form.querySelector("input[name='id']")?.remove();
+
+    const variantsMap = new Map();
+    selectedVariants.forEach((item) => {
+      const variantArray = Array.from(item.values());
+      const variant = window.anotherProduct.variants.find((variant) =>
+        isArraysEqual(variant.options, variantArray),
+      );
+      const inventory = window.anotherProductVariantQuantities.find(
+        (inventory) => isArraysEqual(inventory.options, variant.options),
+      );
+      const currentQuantity = variantsMap.get(variant.id) || 0;
+      if (inventory.managed && inventory.quantity <= currentQuantity) return;
+      variantsMap.set(variant.id, currentQuantity + 1);
+    });
+    const itemList = Array.from(variantsMap, ([id, quantity]) => ({
+      id,
+      quantity,
+    }));
+
+    itemList.forEach((item, index) => {
+      const idInput = document.createElement("input");
+      idInput.type = "hidden";
+      idInput.classList.add("another_form_input");
+      idInput.value = item.id;
+
+      const quantityInput = document.createElement("input");
+      quantityInput.type = "hidden";
+      quantityInput.classList.add("another_form_input");
+      quantityInput.value = item.quantity;
+
+      const collectionAttributeInput = document.createElement("input");
+      collectionAttributeInput.type = "hidden";
+      collectionAttributeInput.classList.add("another_form_input");
+      collectionAttributeInput.value = window.anotherProductCollections
+        .map((collection) => collection.id)
+        .join(",");
+
+      const configIdInput = document.createElement("input");
+      configIdInput.type = "hidden";
+      configIdInput.classList.add("another_form_input");
+      configIdInput.value = this.config.id;
+
+      if (index === 0) {
+        idInput.name = "id";
+        quantityInput.name = "quantity";
+        collectionAttributeInput.name = "properties[_another_collections]";
+        configIdInput.name = "properties[_another_offer_id]";
+      } else {
+        idInput.name = `items[${index - 1}][id]`;
+        quantityInput.name = `items[${index - 1}][quantity]`;
+        collectionAttributeInput.name = `items[${index - 1}][properties[_another_collections]]`;
+        configIdInput.name = `items[${index - 1}][properties[_another_offer_id]]`;
+      }
+
+      this.form.prepend(idInput);
+      this.form.prepend(quantityInput);
+      this.form.prepend(collectionAttributeInput);
+      this.form.prepend(configIdInput);
+    });
+  }
+}
+
+customElements.define(anotherContainer, AnotherContainer);
+
+if (window.anotherTemplate.startsWith("product")) {
+  if (window.anotherOffers.length > 0) {
+    const configIndex = getConfigIndex();
+    if (configIndex >= 0) {
+      const config = window.anotherOffers[configIndex];
+      if (shouldShowOffer(config)) {
+        const container = document.createElement(anotherContainer);
+        container.setAttribute("configIndex", configIndex);
+
+        const form = getAddToCartForm();
+        if (form) {
+          form.insertBefore(container, form.firstChild);
+        }
+
+        if (!config.showThemeVariantPicker) {
+          const themeVariantPicker = document.querySelector("variant-selects");
+          if (themeVariantPicker) themeVariantPicker.style.display = "none";
+        }
+
+        hideQuantitySelection();
+        hideBuyItNowButton();
+      }
+    }
+  }
+}
+
+function getConfigIndex() {
+  return window.anotherOffers.findIndex((config) => {
+    if (config.display === "all_products") return true;
+    if (config.display === "all_products_except") {
+      return !config.allProductsExcept.some((product) => {
+        const id = product.split("/").pop();
+        return window.anotherProduct.id.toString() === id;
+      });
+    }
+    if (config.display === "specific_products") {
+      return config.specificProducts.some((product) => {
+        const id = product.split("/").pop();
+        return window.anotherProduct.id.toString() === id;
+      });
+    }
+    if (config.display === "specific_collections") {
+      return config.specificCollections.some((collection) => {
+        const id = collection.split("/").pop();
+        return window.anotherProductCollections.some((productCollection) => {
+          return productCollection.id.toString() === id;
+        });
+      });
+    }
+    return false;
+  });
+}
+
+function shouldShowOffer(config) {
+  if (config.display === "all_products") return true;
+
+  if (config.display === "all_products_except") {
+    return !config.allProductsExcept.some((product) => {
+      const id = product.split("/").pop();
+      return window.anotherProduct.id.toString() === id;
+    });
+  }
+
+  if (config.display === "specific_products") {
+    return config.specificProducts.some((product) => {
+      const id = product.split("/").pop();
+      return window.anotherProduct.id.toString() === id;
+    });
+  }
+
+  if (config.display === "specific_collections") {
+    return config.specificCollections.some((collection) => {
+      const id = collection.split("/").pop();
+      return window.anotherProductCollections.some((productCollection) => {
+        return productCollection.id.toString() === id;
+      });
+    });
+  }
+}
+
+function hideQuantitySelection() {
+  const quantitySelectorQueries = [
+    ".product-form__quantity",
+    "div[data-block-id='quantity_selector']",
+  ];
+  quantitySelectorQueries.some((query) => {
+    const quantitySelector = document.querySelector(query);
+    if (quantitySelector) {
+      quantitySelector.style.display = "none";
+      return true;
+    }
+    return false;
+  });
+}
+
+function hideBuyItNowButton() {
+  const buyItNowButton = document.querySelector(".shopify-payment-button");
+  if (buyItNowButton) buyItNowButton.style.display = "none";
+}

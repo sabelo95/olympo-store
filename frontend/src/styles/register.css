@@ -1,0 +1,190 @@
+/* ── Página de registro ── */
+.register-page {
+  min-height: 100vh;
+  background: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.register-navbar {
+  background: #1a1a2e;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.register-navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.register-navbar-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.register-navbar-nombre {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.register-navbar-back {
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+.register-navbar-back:hover { color: white; }
+
+/* ── Contenido central ── */
+.register-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.register-card {
+  background: white;
+  border-radius: 14px;
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.register-card-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.register-card-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.register-card-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 6px 0;
+}
+
+.register-card-header p {
+  font-size: 14px;
+  color: #888;
+  margin: 0;
+}
+
+/* ── Campos ── */
+.register-field {
+  margin-bottom: 18px;
+}
+
+.register-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.register-field input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  background: #fafafa;
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+  font-family: inherit;
+}
+
+.register-field input:focus {
+  outline: none;
+  border-color: #1a1a2e;
+  background: white;
+}
+
+.register-field input::placeholder {
+  color: #bbb;
+}
+
+.register-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ── Botón submit ── */
+.register-btn {
+  width: 100%;
+  padding: 12px;
+  background: #e63946;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 6px;
+  font-family: inherit;
+}
+.register-btn:hover:not(:disabled) { background: #c1121f; }
+.register-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+
+/* ── Mensajes ── */
+.register-error {
+  padding: 10px 14px;
+  background: #fff0f0;
+  border: 1px solid #fcc;
+  color: #c0392b;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.register-exito {
+  padding: 18px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #166534;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.register-footer {
+  text-align: center;
+  font-size: 13px;
+  color: #888;
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+
+.register-footer span {
+  color: #1a1a2e;
+  cursor: pointer;
+  font-weight: 700;
+}
+.register-footer span:hover { text-decoration: underline; }

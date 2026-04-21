@@ -1,0 +1,38 @@
+# ── Frontend ──────────────────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env.local
+frontend/.env*.local
+
+# ── Backend ───────────────────────────────────────────────────────────────────
+**/target/
+**/.gradle/
+**/build/
+**/*.class
+**/*.jar
+!**/gradle-wrapper.jar
+**/application-local.properties
+**/application-local.yml
+
+# Imágenes subidas por usuarios (van en S3 en producción)
+**/static/uploads/
+
+# ── IDEs ──────────────────────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.suo
+*.user
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Claude Code ───────────────────────────────────────────────────────────────
+.claude/
