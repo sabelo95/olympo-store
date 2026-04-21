@@ -1,0 +1,39 @@
+[app]
+name = "olympo-notificaciones"
+primary_region = "mia"
+
+[build]
+dockerfile = "Dockerfile"
+
+[env]
+SERVER_PORT = "8085"
+SPRING_PROFILES_ACTIVE = "docker"
+JAVA_OPTS = "-Xmx200m -Xms64m -XX:+UseSerialGC"
+
+[[services]]
+internal_port = 8085
+protocol = "tcp"
+
+[[services.ports]]
+handlers = ["http"]
+port = 80
+
+[[services.ports]]
+handlers = ["tls", "http"]
+port = 443
+
+[services.concurrency]
+hard_limit = 25
+soft_limit = 20
+
+[[services.http_checks]]
+interval = "30s"
+timeout = "10s"
+grace_period = "60s"
+method = "GET"
+path = "/actuator/health"
+
+[vm]
+memory = "512mb"
+cpu_kind = "shared"
+cpus = 1
