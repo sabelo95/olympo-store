@@ -6,28 +6,28 @@ spring:
       routes:
         # ============= RUTAS PARA API-DOCS (SWAGGER) =============
         - id: auth-api-docs
-          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8082
+          uri: ${AUTH_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/auth-api-docs
           filters:
             - SetPath=/v3/api-docs
 
         - id: productos-api-docs
-          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8083
+          uri: ${PRODUCTO_SERVICE_URL:http://localhost:8083}
           predicates:
             - Path=/productos-api-docs
           filters:
             - SetPath=/v3/api-docs
 
         - id: ordenes-api-docs
-          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8084
+          uri: ${COMPRAS_SERVICE_URL:http://localhost:8084}
           predicates:
             - Path=/ordenes-api-docs
           filters:
             - SetPath=/v3/api-docs
 
         - id: notificaciones-api-docs
-          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8085
+          uri: ${NOTIFICACIONES_SERVICE_URL:http://localhost:8085}
           predicates:
             - Path=/notificaciones-api-docs
           filters:
@@ -36,49 +36,49 @@ spring:
 
         # ============= AUTH SERVICE =============
         - id: auth-service
-          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8082
+          uri: ${AUTH_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/auth/**
 
 
         # ============= PRODUCTOS SERVICE =============
         - id: productos-service
-          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8083
+          uri: ${PRODUCTO_SERVICE_URL:http://localhost:8083}
           predicates:
             - Path=/productos/**
 
 
         # ============= CATEGORIAS SERVICE =============
         - id: categorias-service
-          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8083
+          uri: ${PRODUCTO_SERVICE_URL:http://localhost:8083}
           predicates:
             - Path=/categorias/**
 
 
         # ============= MARCAS SERVICE =============
         - id: marcas-service
-          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8083
+          uri: ${PRODUCTO_SERVICE_URL:http://localhost:8083}
           predicates:
             - Path=/marcas/**
 
 
         # ============= REPORTE SERVICE =============
         - id: reporte-service
-          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8083
+          uri: ${PRODUCTO_SERVICE_URL:http://localhost:8083}
           predicates:
             - Path=/reporte/**
 
 
         # ============= ORDENES/COMPRAS SERVICE =============
         - id: ordenes-service
-          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8084
+          uri: ${COMPRAS_SERVICE_URL:http://localhost:8084}
           predicates:
             - Path=/api/carritos/**,/api/clientes/**,/api/pedidos/**,/api/reportes/**,/api/health/**
 
 
         # ============= NOTIFICACIONES SERVICE =============
         - id: notificaciones-service
-          uri: http://arka-load-balancer-598161603.us-east-2.elb.amazonaws.com:8085
+          uri: ${NOTIFICACIONES_SERVICE_URL:http://localhost:8085}
           predicates:
             - Path=/notificaciones/**
 
@@ -87,7 +87,7 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "*"
+            allowedOrigins: "${ALLOWED_ORIGINS:*}"
             allowedMethods:
               - GET
               - POST
@@ -123,8 +123,7 @@ springdoc:
 
 # ============= CONFIGURACIÓN DEL SERVIDOR =============
 server:
-  port: 8081
+  port: ${SERVER_PORT:8081}
   forward-headers-strategy: framework
-
 
 
