@@ -83,24 +83,7 @@ spring:
             - Path=/notificaciones/**
 
 
-      # Configuración global CORS
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "${ALLOWED_ORIGINS:*}"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
-            allowCredentials: false
-
-      # Configuración para forward de headers
       default-filters:
-        - RemoveResponseHeader=Access-Control-Allow-Origin
-        - RemoveResponseHeader=Access-Control-Allow-Credentials
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin, RETAIN_UNIQUE
 
 
