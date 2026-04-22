@@ -99,7 +99,7 @@ spring:
 
       # Configuración para forward de headers
       default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin, RETAIN_UNIQUE
 
 
 # ============= CONFIGURACIÓN DE SWAGGER UI EN EL GATEWAY =============
