@@ -99,6 +99,8 @@ spring:
 
       # Configuración para forward de headers
       default-filters:
+        - RemoveResponseHeader=Access-Control-Allow-Origin
+        - RemoveResponseHeader=Access-Control-Allow-Credentials
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin, RETAIN_UNIQUE
 
 
