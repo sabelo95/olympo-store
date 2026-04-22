@@ -28,7 +28,7 @@ soft_limit = 20
 [[services.http_checks]]
 interval = "30s"
 timeout = "10s"
-grace_period = "60s"
+grace_period = "180s"
 method = "GET"
 path = "/actuator/health"
 
