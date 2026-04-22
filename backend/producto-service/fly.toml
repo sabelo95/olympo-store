@@ -1,6 +1,5 @@
-[app]
-name = "olympo-productos"
-primary_region = "mia"
+app = "olympo-productos"
+primary_region = "gru"
 
 [build]
 dockerfile = "Dockerfile"

@@ -1,6 +1,5 @@
-[app]
-name = "olympo-login"
-primary_region = "mia"
+app = "olympo-login"
+primary_region = "gru"
 
 [build]
 dockerfile = "Dockerfile"
