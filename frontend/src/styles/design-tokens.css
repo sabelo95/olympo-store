@@ -1,0 +1,123 @@
+/* ============================================================
+   OLYMPO STORE — Design System Tokens
+   Dark, aggressive, gladiator-fueled. Black + electric lime.
+   ============================================================ */
+
+:root {
+  /* ---------- BASE NEUTRALS ---------- */
+  --olympo-black:       #050505;
+  --olympo-obsidian:    #0b0b0d;
+  --olympo-graphite:    #131316;
+  --olympo-iron:        #1c1c21;
+  --olympo-steel:       #2a2a31;
+  --olympo-ash:         #3d3d46;
+  --olympo-smoke:       #6e6e78;
+  --olympo-fog:         #9c9ca5;
+  --olympo-bone:        #d8d8dc;
+  --olympo-marble:      #f5f5f7;
+  --olympo-pure:        #ffffff;
+
+  /* ---------- BRAND ACCENTS ---------- */
+  --olympo-lime:        #c6ff00;
+  --olympo-lime-dim:    #9ccc00;
+  --olympo-lime-glow:   #d6ff4d;
+  --olympo-blood:       #ff2e2e;
+  --olympo-blood-dim:   #c81e1e;
+  --olympo-gold:        #f5a623;
+
+  /* ---------- SEMANTIC ---------- */
+  --olympo-success:     #00d26a;
+  --olympo-warning:     #f5a623;
+  --olympo-danger:      var(--olympo-blood);
+  --olympo-info:        #2dd4ff;
+
+  /* ---------- BG / FG TOKENS ---------- */
+  --bg-0: var(--olympo-black);
+  --bg-1: var(--olympo-obsidian);
+  --bg-2: var(--olympo-graphite);
+  --bg-3: var(--olympo-iron);
+
+  --fg-1: var(--olympo-marble);
+  --fg-2: var(--olympo-fog);
+  --fg-3: var(--olympo-smoke);
+  --fg-on-accent: #050505;
+
+  --border-1: var(--olympo-steel);
+  --border-2: var(--olympo-ash);
+  --border-accent: var(--olympo-lime);
+
+  /* ---------- TYPE FAMILIES ---------- */
+  --font-display:  'Barlow Condensed', 'Oswald', 'Arial Narrow', sans-serif;
+  --font-headline: 'Oswald', 'Barlow Condensed', sans-serif;
+  --font-body:     'Barlow', 'Inter', system-ui, sans-serif;
+  --font-mono:     'JetBrains Mono', ui-monospace, monospace;
+
+  /* ---------- TYPE SCALE ---------- */
+  --fs-display-xl: clamp(56px, 9vw, 128px);
+  --fs-display-lg: clamp(44px, 6vw, 88px);
+  --fs-display:    clamp(36px, 4.5vw, 64px);
+  --fs-h1: 48px;
+  --fs-h2: 36px;
+  --fs-h3: 26px;
+  --fs-h4: 20px;
+  --fs-h5: 16px;
+  --fs-body-lg: 17px;
+  --fs-body: 15px;
+  --fs-small: 13px;
+  --fs-micro: 11px;
+
+  --lh-tight: 0.95;
+  --lh-snug: 1.1;
+  --lh-body: 1.55;
+
+  --tracking-shout:    0.08em;
+  --tracking-headline: 0.01em;
+  --tracking-body:     0;
+  --tracking-eyebrow:  0.18em;
+
+  /* ---------- SPACING ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+  --sp-9: 96px;
+
+  /* ---------- RADIUS ---------- */
+  --r-sm:   4px;
+  --r-md:   8px;
+  --r-lg:   14px;
+  --r-pill: 999px;
+
+  /* ---------- SHADOWS / GLOW ---------- */
+  --shadow-1:    0 1px 2px rgba(0,0,0,0.4);
+  --shadow-2:    0 4px 14px rgba(0,0,0,0.5);
+  --shadow-3:    0 16px 40px rgba(0,0,0,0.65);
+  --shadow-card: 0 2px 0 rgba(255,255,255,0.04) inset, 0 8px 24px rgba(0,0,0,0.5);
+  --glow-lime:   0 0 0 1px rgba(198,255,0,0.4), 0 0 24px rgba(198,255,0,0.35);
+  --glow-blood:  0 0 0 1px rgba(255,46,46,0.4), 0 0 24px rgba(255,46,46,0.4);
+
+  /* ---------- TRANSITIONS ---------- */
+  --t-fast: 120ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-base: 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-slow: 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Global reset for the app */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg-0);
+  color: var(--fg-1);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection { background: var(--olympo-lime); color: var(--olympo-black); }

@@ -1,0 +1,301 @@
+### Olympo Store — Compras-service endpoints
+### Clientes, carrito, cupones, pedidos y dashboard
+
+@gateway = http://localhost:8081
+@tokenCliente = <PEGAR_ACCESS_TOKEN_CLIENTE_AQUI>
+@tokenAdmin   = <PEGAR_ACCESS_TOKEN_ADMIN_AQUI>
+
+###############################################################################
+# ── CLIENTES ────────────────────────────────────────────────────────────────
+###############################################################################
+
+###############################################################################
+# 1. Crear cliente (vincula usuarioId con datos de cliente)
+###############################################################################
+POST {{gateway}}/api/clientes
+Content-Type: application/json
+Authorization: Bearer {{tokenCliente}}
+
+{
+  "usuarioId": 2,
+  "nit": "1234567890",
+  "nombre": "Juan Pérez",
+  "correo": "juan@test.com",
+  "telefono": "3001234567",
+  "direccion": "Calle 123 # 45-67, Medellín"
+}
+
+###############################################################################
+# 2. Obtener cliente por NIT
+###############################################################################
+@nit = 1234567890
+
+GET {{gateway}}/api/clientes/nit/{{nit}}
+Authorization: Bearer {{tokenCliente}}
+
+###############################################################################
+# 3. Obtener cliente por usuarioId
+###############################################################################
+@usuarioId = 2
+
+GET {{gateway}}/api/clientes/usuario/{{usuarioId}}
+Authorization: Bearer {{tokenCliente}}
+
+###############################################################################
+# 4. Actualizar cliente
+###############################################################################
+@clienteId = 1
+
+PUT {{gateway}}/api/clientes/{{clienteId}}
+Content-Type: application/json
+Authorization: Bearer {{tokenCliente}}
+
+{
+  "nombre": "Juan Pérez Actualizado",
+  "telefono": "3009876543",
+  "direccion": "Carrera 80 # 10-20, Medellín"
+}
+
+###############################################################################
+# 5. Eliminar cliente
+###############################################################################
+@clienteIdEliminar = 99
+
+DELETE {{gateway}}/api/clientes/{{clienteIdEliminar}}
+Authorization: Bearer {{tokenAdmin}}
+
+###############################################################################
+# ── CARRITO ──────────────────────────────────────────────────────────────────
+###############################################################################
+
+###############################################################################
+# 6. Crear carrito
+###############################################################################
+# @name crearCarrito
+POST {{gateway}}/api/carritos
+Content-Type: application/json
+Authorization: Bearer {{tokenCliente}}
+
+{
+  "clienteId": {{clienteId}},
+  "abandonado": false,
+  "productos": [
+    { "productoId": 1, "cantidad": 2 },
+    { "productoId": 3, "cantidad": 1 }
+  ]
+}
+
+###############################################################################
+# 7. Actualizar carrito (sincronización desde frontend)
+###############################################################################
+@carritoId = 1
+
+PUT {{gateway}}/api/carritos/{{carritoId}}/{{clienteId}}
+Content-Type: application/json
+Authorization: Bearer {{tokenCliente}}
+
+{
+  "clienteId": {{clienteId}},
+  "abandonado": false,
+  "productos": [
+    { "productoId": 1, "cantidad": 3 },
+    { "productoId": 3, "cantidad": 1 },
+    { "productoId": 5, "cantidad": 2 }
+  ]
+}
+
+###############################################################################
+# 8. Obtener carrito activo por clienteId
+###############################################################################
+GET {{gateway}}/api/carritos/cliente/{{clienteId}}
+Authorization: Bearer {{tokenCliente}}
+
+###############################################################################
+# 9. Eliminar carrito
+###############################################################################
+DELETE {{gateway}}/api/carritos/{{carritoId}}
+Authorization: Bearer {{tokenCliente}}
+
+###############################################################################
+# ── CUPONES ──────────────────────────────────────────────────────────────────
+###############################################################################
+
+###############################################################################
+# 10. Validar cupón (público — no requiere token)
+#     total: monto total de la compra en pesos
+###############################################################################
+@codigoCupon = DESCUENTO10
+
+GET {{gateway}}/api/cupones/validar/{{codigoCupon}}?total=200000
+
+###############################################################################
+# 11. Validar cupón — monto menor al mínimo (espera 400)
+###############################################################################
+GET {{gateway}}/api/cupones/validar/{{codigoCupon}}?total=5000
+
+###############################################################################
+# 12. Listar todos los cupones (requiere ADMIN)
+###############################################################################
+GET {{gateway}}/api/cupones
+Authorization: Bearer {{tokenAdmin}}
+
+###############################################################################
+# 13. Obtener cupón por código
+###############################################################################
+GET {{gateway}}/api/cupones/{{codigoCupon}}
+Authorization: Bearer {{tokenAdmin}}
+
+###############################################################################
+# 14. Crear cupón
+###############################################################################
+POST {{gateway}}/api/cupones
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+  "codigo": "VERANO2025",
+  "descuentoPorcentaje": 15,
+  "descuentoFijo": null,
+  "activo": true,
+  "fechaExpiracion": "2025-12-31T23:59:59",
+  "usoMaximo": 100,
+  "montoMinimo": 100000
+}
+
+###############################################################################
+# 15. Actualizar cupón
+###############################################################################
+PUT {{gateway}}/api/cupones/VERANO2025
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+  "codigo": "VERANO2025",
+  "descuentoPorcentaje": 20,
+  "descuentoFijo": null,
+  "activo": true,
+  "fechaExpiracion": "2025-12-31T23:59:59",
+  "usoMaximo": 150,
+  "montoMinimo": 80000
+}
+
+###############################################################################
+# 16. Eliminar cupón
+###############################################################################
+DELETE {{gateway}}/api/cupones/VERANO2025
+Authorization: Bearer {{tokenAdmin}}
+
+###############################################################################
+# ── PEDIDOS ──────────────────────────────────────────────────────────────────
+###############################################################################
+
+###############################################################################
+# 17. Crear pedido desde carrito activo
+###############################################################################
+POST {{gateway}}/api/pedidos
+Content-Type: application/json
+Authorization: Bearer {{tokenCliente}}
+
+{
+  "clienteId": {{clienteId}},
+  "carritoId": {{carritoId}},
+  "metodoPago": "TRANSFERENCIA",
+  "direccionEnvio": "Calle 123 # 45-67, Medellín",
+  "codigoCupon": null,
+  "notas": "Entregar en horario de oficina"
+}
+
+###############################################################################
+# 18. Crear pedido con cupón aplicado
+###############################################################################
+POST {{gateway}}/api/pedidos
+Content-Type: application/json
+Authorization: Bearer {{tokenCliente}}
+
+{
+  "clienteId": {{clienteId}},
+  "carritoId": {{carritoId}},
+  "metodoPago": "WOMPI",
+  "direccionEnvio": "Calle 123 # 45-67, Medellín",
+  "codigoCupon": "DESCUENTO10",
+  "notas": ""
+}
+
+###############################################################################
+# 19. Listar todos los pedidos (admin)
+###############################################################################
+GET {{gateway}}/api/pedidos
+Authorization: Bearer {{tokenAdmin}}
+
+###############################################################################
+# 20. Obtener pedidos de un cliente
+###############################################################################
+GET {{gateway}}/api/pedidos/cliente/{{clienteId}}
+Authorization: Bearer {{tokenCliente}}
+
+###############################################################################
+# 21. Actualizar estado de pedido (admin)
+###############################################################################
+@pedidoId = 1
+
+PUT {{gateway}}/api/pedidos/{{pedidoId}}/estado
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+  "estado": "EN_PROCESO"
+}
+
+###############################################################################
+# 22. Estados posibles: PENDIENTE → EN_PROCESO → ENVIADO → ENTREGADO | CANCELADO
+###############################################################################
+PUT {{gateway}}/api/pedidos/{{pedidoId}}/estado
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+  "estado": "ENVIADO"
+}
+
+###############################################################################
+# ── DASHBOARD (requiere ADMINISTRADOR) ──────────────────────────────────────
+###############################################################################
+
+###############################################################################
+# 23. Resumen general (KPIs)
+###############################################################################
+GET {{gateway}}/api/dashboard/resumen
+Authorization: Bearer {{tokenAdmin}}
+
+###############################################################################
+# 24. Pedidos recientes
+###############################################################################
+GET {{gateway}}/api/dashboard/pedidos-recientes?limite=10
+Authorization: Bearer {{tokenAdmin}}
+
+###############################################################################
+# 25. Top productos más vendidos
+###############################################################################
+GET {{gateway}}/api/dashboard/top-productos?limite=5
+Authorization: Bearer {{tokenAdmin}}
+
+###############################################################################
+# 26. Ventas por período
+###############################################################################
+GET {{gateway}}/api/dashboard/ventas-por-periodo?fechaInicio=2024-01-01T00:00:00&fechaFin=2024-12-31T23:59:59
+Authorization: Bearer {{tokenAdmin}}
+
+###############################################################################
+# 27. Dashboard sin token — espera 401/403
+###############################################################################
+GET {{gateway}}/api/dashboard/resumen
+
+###############################################################################
+# ── WOMPI ────────────────────────────────────────────────────────────────────
+###############################################################################
+
+###############################################################################
+# 28. Obtener firma para widget de Wompi
+###############################################################################
+GET {{gateway}}/api/wompi/firma?referencia=PEDIDO-001&monto=150000&moneda=COP
+Authorization: Bearer {{tokenCliente}}

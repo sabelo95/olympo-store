@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/tamanos")
-@CrossOrigin(origins = "*")
 public class TamanoController {
 
     @Autowired

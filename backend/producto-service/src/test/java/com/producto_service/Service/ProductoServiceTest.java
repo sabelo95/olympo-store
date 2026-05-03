@@ -1,6 +1,7 @@
 package com.producto_service.Service;
 
-import com.producto_service.Model.*;
+import com.producto_service.Mapper.ProductoMapper;
+import com.producto_service.Model.Producto;
 import com.producto_service.Repository.ProductoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,18 @@ class ProductoServiceTestSimple {
 
     @Mock
     private ProductoRepository productoRepository;
+
+    @Mock
+    private MarcaService marcaService;
+
+    @Mock
+    private CategoriaService categoriaService;
+
+    @Mock
+    private HistorialService historialService;
+
+    @Mock
+    private ProductoMapper productoMapper;
 
     @InjectMocks
     private ProductoService productoService;
@@ -87,8 +100,6 @@ class ProductoServiceTestSimple {
             productoService.eliminarProducto("Producto Inexistente");
         });
     }
-
-
 
     @Test
     void test9_obtenerProductosConStockBajo() {

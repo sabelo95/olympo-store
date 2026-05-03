@@ -9,6 +9,8 @@ const agruparVariantes = (productos) => {
     descripcion: productos[0]?.descripcion,
     categoria: productos[0]?.categoria,
     marca: productos[0]?.marca,
+    imagenGeneral: productos.find((p) => p.imagenGeneral)?.imagenGeneral ?? null,
+    imagenNutricional: productos.find((p) => p.imagenNutricional)?.imagenNutricional ?? null,
     variantes: productos.map((p) => ({
       id: p.id,
       productoId: p.id,
@@ -111,41 +113,49 @@ export default function DetalleProducto() {
       <div className="detalle-grid">
         {/* Imágenes */}
         <div>
-          <div
-            className="detalle-imagen-principal"
-            onClick={() =>
-              varianteActiva?.imagenGeneral &&
-              setImagenZoom(`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/generales/${varianteActiva.imagenGeneral}`)
-            }
-          >
-            {varianteActiva?.imagenGeneral ? (
-              <img
-                src={`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/generales/${varianteActiva.imagenGeneral}`}
-                alt={grupo.nombre}
-                onError={(e) => { e.target.style.display = "none"; }}
-              />
-            ) : (
-              <div className="detalle-imagen-placeholder">📦</div>
-            )}
-          </div>
+          {(() => {
+            const imgGeneral = varianteActiva?.imagenGeneral || grupo.imagenGeneral;
+            const imgNutricional = varianteActiva?.imagenNutricional || grupo.imagenNutricional;
+            return (
+              <>
+                <div
+                  className="detalle-imagen-principal"
+                  onClick={() =>
+                    imgGeneral &&
+                    setImagenZoom(`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/generales/${imgGeneral}`)
+                  }
+                >
+                  {imgGeneral ? (
+                    <img
+                      src={`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/generales/${imgGeneral}`}
+                      alt={grupo.nombre}
+                      onError={(e) => { e.target.style.display = "none"; }}
+                    />
+                  ) : (
+                    <div className="detalle-imagen-placeholder">📦</div>
+                  )}
+                </div>
 
-          {varianteActiva?.imagenNutricional && (
-            <>
-              <p className="detalle-nutricional-label">Información Nutricional</p>
-              <div
-                className="detalle-nutricional"
-                onClick={() =>
-                  setImagenZoom(`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/nutricionales/${varianteActiva.imagenNutricional}`)
-                }
-              >
-                <img
-                  src={`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/nutricionales/${varianteActiva.imagenNutricional}`}
-                  alt="Info nutricional"
-                  onError={(e) => { e.target.style.display = "none"; }}
-                />
-              </div>
-            </>
-          )}
+                {imgNutricional && (
+                  <>
+                    <p className="detalle-nutricional-label">Información Nutricional</p>
+                    <div
+                      className="detalle-nutricional"
+                      onClick={() =>
+                        setImagenZoom(`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/nutricionales/${imgNutricional}`)
+                      }
+                    >
+                      <img
+                        src={`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/nutricionales/${imgNutricional}`}
+                        alt="Info nutricional"
+                        onError={(e) => { e.target.style.display = "none"; }}
+                      />
+                    </div>
+                  </>
+                )}
+              </>
+            );
+          })()}
         </div>
 
         {/* Info */}

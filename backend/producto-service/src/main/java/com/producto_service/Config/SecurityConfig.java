@@ -2,12 +2,12 @@ package com.producto_service.Config;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -16,22 +16,22 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
 @Configuration
-@EnableMethodSecurity   // 👈 habilita @PreAuthorize
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Value("${jwt.secret}")
     private String secret;
 
-    // SecurityFilterChain para rutas públicas (Swagger) - Sin OAuth2
+    @Autowired
+    private InternalApiKeyFilter internalApiKeyFilter;
+
+    // SecurityFilterChain para rutas públicas (Swagger + imágenes) - Sin OAuth2
     @Bean
     @Order(1)
     public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -46,11 +46,12 @@ public class SecurityConfig {
                         "/swagger-resources/**",
                         "/webjars/**",
                         "/actuator/**",
-                        "/swagger-ui/index.html"
+                        "/swagger-ui/index.html",
+                        "/uploads/**",
+                        "/error"
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-                // No configurar oauth2ResourceServer - esto excluye estas rutas del procesamiento JWT
 
         return http.build();
     }
@@ -61,7 +62,6 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain protectedSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // ✅ CORRECTO EN SPRING 6
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
 
@@ -76,7 +76,6 @@ public class SecurityConfig {
                                 "/reporte/inventario-bajo",
                                 "/productos/health",
                                 "/uploads/**"
-
                         ).permitAll()
 
 
@@ -100,7 +99,8 @@ public class SecurityConfig {
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(
                         jwt -> jwt.decoder(jwtDecoder())
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                ));
+                ))
+                .addFilterBefore(internalApiKeyFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -112,23 +112,6 @@ public class SecurityConfig {
         SecretKey key = new SecretKeySpec(keyBytes, "HmacSHA256");
         return NimbusJwtDecoder.withSecretKey(key).build();
     }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {

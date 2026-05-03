@@ -101,28 +101,23 @@ export const actualizarProducto = async (nombre, producto) => {
 };
 
 // Nueva función para actualizar producto con imágenes
-export const actualizarProductoConImagenes = async (nombre, productoData, imagenGeneral, imagenNutricional) => {
+export const actualizarProductoConImagenes = async (nombre, productoData, imagenGeneral, imagenNutricional, eliminarImagenGeneral = false, eliminarImagenNutricional = false) => {
   const formData = new FormData();
-  
-  // Agregar el producto como JSON
-  formData.append('producto', new Blob([JSON.stringify(productoData)], {
-    type: 'application/json'
-  }));
-  
-  // Agregar las imágenes si existen
-  if (imagenGeneral) {
-    formData.append('imagenGeneral', imagenGeneral);
-  }
-  if (imagenNutricional) {
-    formData.append('imagenNutricional', imagenNutricional);
-  }
-  
+
+  formData.append('producto', new Blob([JSON.stringify(productoData)], { type: 'application/json' }));
+
+  if (imagenGeneral) formData.append('imagenGeneral', imagenGeneral);
+  if (imagenNutricional) formData.append('imagenNutricional', imagenNutricional);
+
   const encodedNombre = encodeURIComponent(nombre);
-  const res = await fetch(`${API_URL}/${encodedNombre}`, {
+  const params = new URLSearchParams();
+  if (eliminarImagenGeneral) params.append('eliminarImagenGeneral', 'true');
+  if (eliminarImagenNutricional) params.append('eliminarImagenNutricional', 'true');
+  const query = params.toString() ? `?${params.toString()}` : '';
+
+  const res = await fetch(`${API_URL}/${encodedNombre}${query}`, {
     method: "PUT",
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    },
+    headers: { Authorization: `Bearer ${getToken()}` },
     body: formData
   });
   
@@ -147,14 +142,56 @@ export const obtenerProductoPorNombre = async (nombre) => {
   return res.json();
 };
 
-export const eliminarProducto = async (nombre) => {
-  const encodedNombre = encodeURIComponent(nombre);
-  const res = await fetch(`${API_URL}/${encodedNombre}`, {
+export const actualizarProductoConImagenesPorId = async (id, productoData, imagenGeneral, imagenNutricional, eliminarImagenGeneral = false, eliminarImagenNutricional = false) => {
+  const formData = new FormData();
+  formData.append("producto", new Blob([JSON.stringify(productoData)], { type: "application/json" }));
+  if (imagenGeneral) formData.append("imagenGeneral", imagenGeneral);
+  if (imagenNutricional) formData.append("imagenNutricional", imagenNutricional);
+
+  const params = new URLSearchParams();
+  if (eliminarImagenGeneral) params.append("eliminarImagenGeneral", "true");
+  if (eliminarImagenNutricional) params.append("eliminarImagenNutricional", "true");
+  const query = params.toString() ? `?${params.toString()}` : "";
+
+  const res = await fetch(`${API_URL}/id/${id}/editar${query}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${getToken()}` },
+    body: formData,
+  });
+  if (!res.ok) {
+    const msg = await res.text().catch(() => "");
+    throw new Error(msg || `Error al actualizar producto: ${res.status}`);
+  }
+  return res.json();
+};
+
+export const obtenerProductoPorId = async (id) => {
+  const res = await fetch(`${API_URL}/id/${id}`, { headers: headers() });
+  if (!res.ok) throw new Error(`Producto no encontrado: ${res.status}`);
+  return res.json();
+};
+
+export const actualizarProductoPorId = async (id, productoData) => {
+  const res = await fetch(`${API_URL}/id/${id}`, {
+    method: "PUT",
+    headers: headers(),
+    body: JSON.stringify(productoData),
+  });
+  if (!res.ok) {
+    const msg = await res.text().catch(() => "");
+    throw new Error(msg || `Error al actualizar producto: ${res.status}`);
+  }
+  return res.json();
+};
+
+export const eliminarProducto = async (id) => {
+  const res = await fetch(`${API_URL}/id/${id}`, {
     method: "DELETE",
     headers: headers()
   });
-  
+
   if (!res.ok) {
-    throw new Error(`Error al eliminar producto: ${res.status}`);
+    const msg = await res.text().catch(() => "");
+    throw new Error(msg || `Error al eliminar producto: ${res.status}`);
   }
 };

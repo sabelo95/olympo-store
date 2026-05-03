@@ -8,6 +8,8 @@ dockerfile = "Dockerfile"
 SERVER_PORT = "8081"
 SPRING_PROFILES_ACTIVE = "docker"
 JAVA_OPTS = "-Xmx200m -Xms64m -XX:+UseSerialGC"
+SPRINGDOC_SWAGGER_UI_ENABLED = "false"
+SPRINGDOC_API_DOCS_ENABLED = "false"
 
 [[services]]
 internal_port = 8081

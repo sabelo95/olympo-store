@@ -42,6 +42,19 @@ export const eliminarUsuario = async (id) => {
   }
 };
 
+export const crearUsuario = async ({ nombre, correo, contrasena, rol }) => {
+  const res = await fetch(`${API_AUTH}/crear`, {
+    method: "POST",
+    headers: headers(),
+    body: JSON.stringify({ nombre, correo, contrasena, rol, activo: true }),
+  });
+  if (!res.ok) {
+    const msg = await res.text();
+    throw new Error(msg || "Error al crear usuario");
+  }
+  return res.json();
+};
+
 // Activa o desactiva usando el endpoint de actualización (no hay endpoints separados)
 export const toggleActivoUsuario = async (usuario) => {
   return actualizarUsuario(usuario.id, {

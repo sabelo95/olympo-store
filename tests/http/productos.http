@@ -1,0 +1,218 @@
+### Olympo Store — Producto-service endpoints
+### Endpoints de catálogo públicos y de administración de productos
+
+@gateway = http://localhost:8081
+@token = <PEGAR_ACCESS_TOKEN_ADMIN_AQUI>
+
+###############################################################################
+# ── CATÁLOGO (sin autenticación) ────────────────────────────────────────────
+###############################################################################
+
+###############################################################################
+# 1. Listar todos los productos
+###############################################################################
+GET {{gateway}}/productos
+
+###############################################################################
+# 2. Obtener productos por nombre
+###############################################################################
+@nombreProducto = Whey Protein
+
+GET {{gateway}}/productos/{{nombreProducto}}
+
+###############################################################################
+# 3. Obtener producto por ID
+###############################################################################
+@productoId = 1
+
+GET {{gateway}}/productos/id/{{productoId}}
+
+###############################################################################
+# 4. Listar categorías
+###############################################################################
+GET {{gateway}}/categorias
+
+###############################################################################
+# 5. Listar marcas
+###############################################################################
+GET {{gateway}}/marcas
+
+###############################################################################
+# 6. Listar sabores
+###############################################################################
+GET {{gateway}}/sabores
+
+###############################################################################
+# 7. Listar tamaños
+###############################################################################
+GET {{gateway}}/tamanos
+
+###############################################################################
+# ── ADMINISTRACIÓN (requiere token ADMINISTRADOR) ───────────────────────────
+###############################################################################
+
+###############################################################################
+# 8. Crear producto (JSON sin imágenes)
+#    Para crear con imágenes usar multipart/form-data (ver nota más abajo)
+###############################################################################
+POST {{gateway}}/productos
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Producto Test",
+  "descripcion": "Descripción de prueba",
+  "precio": 75000,
+  "cantidad": 50,
+  "categoriaId": 1,
+  "marcaId": 1,
+  "saborId": null,
+  "tamanoId": null
+}
+
+###############################################################################
+# NOTA — Crear producto con imagen (multipart)
+# Descomentar y ajustar rutas de archivo para usar con REST Client:
+#
+# POST {{gateway}}/productos
+# Content-Type: multipart/form-data; boundary=----Boundary
+# Authorization: Bearer {{token}}
+#
+# ------Boundary
+# Content-Disposition: form-data; name="producto"
+# Content-Type: application/json
+#
+# {"nombre":"Whey Protein","precio":120000,"cantidad":30,"categoriaId":1,"marcaId":1}
+# ------Boundary
+# Content-Disposition: form-data; name="imagenGeneral"; filename="producto.jpg"
+# Content-Type: image/jpeg
+# < C:/ruta/a/imagen.jpg
+# ------Boundary--
+###############################################################################
+
+###############################################################################
+# 9. Actualizar producto
+###############################################################################
+PUT {{gateway}}/productos/id/{{productoId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Producto Actualizado",
+  "descripcion": "Nueva descripción",
+  "precio": 80000,
+  "cantidad": 45,
+  "categoriaId": 1,
+  "marcaId": 1
+}
+
+###############################################################################
+# 10. Eliminar producto
+###############################################################################
+@productoIdEliminar = 99
+
+DELETE {{gateway}}/productos/id/{{productoIdEliminar}}
+Authorization: Bearer {{token}}
+
+###############################################################################
+# ── GESTIÓN DE STOCK ────────────────────────────────────────────────────────
+###############################################################################
+
+###############################################################################
+# 11. Reducir stock (usado internamente por compras-service al crear pedido)
+#     Body: mapa { productoId: cantidadAReducir }
+###############################################################################
+POST {{gateway}}/productos/reducir-stock
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "1": 2,
+  "2": 1
+}
+
+###############################################################################
+# 12. Reponer stock
+###############################################################################
+POST {{gateway}}/productos/reposicion-stock
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "1": 10,
+  "3": 5
+}
+
+###############################################################################
+# 13. Reporte de inventario bajo (productos con stock < límite)
+###############################################################################
+GET {{gateway}}/reporte/inventario-bajo?limite=5
+Authorization: Bearer {{token}}
+
+###############################################################################
+# ── CATEGORÍAS (CRUD admin) ─────────────────────────────────────────────────
+###############################################################################
+
+###############################################################################
+# 14. Crear categoría
+###############################################################################
+POST {{gateway}}/categorias
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Proteínas"
+}
+
+###############################################################################
+# 15. Actualizar categoría
+###############################################################################
+@categoriaId = 1
+
+PUT {{gateway}}/categorias/{{categoriaId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Proteínas Premium"
+}
+
+###############################################################################
+# 16. Eliminar categoría
+###############################################################################
+DELETE {{gateway}}/categorias/{{categoriaId}}
+Authorization: Bearer {{token}}
+
+###############################################################################
+# ── MARCAS (CRUD admin) ──────────────────────────────────────────────────────
+###############################################################################
+
+###############################################################################
+# 17. Crear marca
+###############################################################################
+POST {{gateway}}/marcas
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Optimum Nutrition"
+}
+
+###############################################################################
+# 18. Actualizar marca
+###############################################################################
+@marcaId = 1
+
+PUT {{gateway}}/marcas/{{marcaId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "ON Gold Standard"
+}
+
+###############################################################################
+# 19. Eliminar marca
+###############################################################################
+DELETE {{gateway}}/marcas/{{marcaId}}
+Authorization: Bearer {{token}}

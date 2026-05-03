@@ -55,6 +55,7 @@ class CategoriaServiceTestSimple {
 
     @Test
     void test2_crearCategoria_exitoso() {
+        // findByNombre returns null => name is free
         when(categoriaRepository.findByNombre("Electrónica")).thenReturn(null);
         when(categoriaRepository.save(any(Categoria.class))).thenReturn(categoria);
 
@@ -66,17 +67,19 @@ class CategoriaServiceTestSimple {
 
     @Test
     void test3_crearCategoria_nombreDuplicado_lanzaExcepcion() {
+        // findByNombre returns existing entity => name is taken
         when(categoriaRepository.findByNombre("Electrónica")).thenReturn(categoria);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            categoriaService.crearCategoria(categoriaDto);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+                categoriaService.crearCategoria(categoriaDto));
 
         verify(categoriaRepository, never()).save(any());
     }
 
     @Test
     void test4_eliminarCategoria_exitoso() {
+        // Categoria has no products, so deletion is allowed
+        categoria.setProductos(null);
         when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
 
         categoriaService.eliminarCategoriaPorId(1L);

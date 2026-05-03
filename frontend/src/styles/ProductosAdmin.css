@@ -1,6 +1,9 @@
 .productos-admin {
   padding: 24px 20px;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--font-body);
+  color: var(--fg-1);
+  background: var(--bg-0);
+  min-height: 100vh;
 }
 
 /* ── Header ── */
@@ -15,43 +18,45 @@
 
 .productos-admin-header h1 {
   margin: 0;
-  font-size: 24px;
-  color: #1a1a2e;
+  font-family: var(--font-headline);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--fg-1);
 }
 
-.header-botones {
-  display: flex;
-  gap: 10px;
-}
+.header-botones { display: flex; gap: 10px; }
 
 /* ── Botones ── */
 .btn-reporte {
-  padding: 10px 20px;
-  background-color: #17a2b8;
-  color: white;
-  border: none;
+  padding: 9px 18px;
+  background: transparent;
+  color: var(--olympo-info);
+  border: 1px solid var(--olympo-info);
   cursor: pointer;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: var(--r-md);
+  font-family: var(--font-body);
+  font-weight: 600;
   font-size: 14px;
-  transition: background-color 0.2s;
+  transition: background var(--t-fast), color var(--t-fast);
 }
 
-.btn-reporte:hover { background-color: #138496; }
+.btn-reporte:hover { background: var(--olympo-info); color: var(--fg-on-accent); }
 
 .btn-agregar {
-  padding: 10px 20px;
-  background-color: #28a745;
-  color: white;
+  padding: 9px 18px;
+  background: var(--olympo-lime);
+  color: var(--fg-on-accent);
   border: none;
   cursor: pointer;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: var(--r-md);
+  font-family: var(--font-body);
+  font-weight: 700;
   font-size: 14px;
-  transition: background-color 0.2s;
+  transition: opacity var(--t-fast);
 }
 
-.btn-agregar:hover { background-color: #218838; }
+.btn-agregar:hover { opacity: 0.85; }
 
 /* ── Info y filtros ── */
 .tabla-info {
@@ -60,20 +65,22 @@
   gap: 10px;
   margin-bottom: 12px;
   font-size: 14px;
-  color: #555;
+  color: var(--fg-3);
 }
 
 .btn-limpiar {
   padding: 5px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #fff;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-sm);
+  background: var(--bg-3);
+  color: var(--fg-2);
   cursor: pointer;
   font-size: 13px;
-  transition: background-color 0.2s;
+  font-family: var(--font-body);
+  transition: background var(--t-fast);
 }
 
-.btn-limpiar:hover { background-color: #f0f0f0; }
+.btn-limpiar:hover { background: var(--bg-2); color: var(--fg-1); }
 
 /* ── Tabla ── */
 .tabla-wrapper { overflow-x: auto; }
@@ -87,69 +94,82 @@
 
 .tabla-productos th {
   padding: 10px 12px;
-  background-color: #f0f0f0;
+  background: var(--bg-3);
   text-align: left;
-  font-weight: 600;
-  color: #333;
-  border: 1px solid #ddd;
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-3);
+  border-bottom: 1px solid var(--border-1);
 }
 
 .tabla-productos td {
   padding: 9px 12px;
-  border: 1px solid #eee;
-  color: #444;
+  border-bottom: 1px solid var(--border-1);
+  color: var(--fg-2);
 }
 
-.tabla-productos tbody tr:hover {
-  background-color: #f8f9fa;
+.tabla-productos tbody tr:hover td {
+  background: var(--bg-2);
+  color: var(--fg-1);
 }
 
 /* Fila de filtros */
 .fila-filtros th {
-  background-color: #f9f9f9;
+  background: var(--bg-2);
   padding: 6px 8px;
 }
 
 .filtro-input {
   width: 95%;
   padding: 5px 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-sm);
   font-size: 13px;
+  font-family: var(--font-body);
+  background: var(--bg-3);
+  color: var(--fg-1);
   box-sizing: border-box;
+  transition: border-color var(--t-fast);
 }
 
 .filtro-input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--olympo-lime);
+  box-shadow: 0 0 0 2px rgba(198,255,0,0.12);
 }
 
 /* ── Acciones ── */
 .btn-editar {
   padding: 5px 12px;
   margin-right: 6px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #fff;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-sm);
+  background: var(--bg-3);
+  color: var(--fg-1);
   cursor: pointer;
   font-size: 13px;
-  transition: background-color 0.2s;
+  font-family: var(--font-body);
+  transition: background var(--t-fast), border-color var(--t-fast);
 }
 
-.btn-editar:hover { background-color: #e9ecef; }
+.btn-editar:hover { background: var(--bg-2); border-color: var(--olympo-lime); color: var(--olympo-lime); }
 
 .btn-eliminar {
   padding: 5px 12px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  background: transparent;
+  color: var(--olympo-blood);
+  border: 1px solid var(--olympo-blood);
+  border-radius: var(--r-sm);
   cursor: pointer;
   font-size: 13px;
-  transition: background-color 0.2s;
+  font-family: var(--font-body);
+  transition: background var(--t-fast), color var(--t-fast);
 }
 
-.btn-eliminar:hover { background-color: #c82333; }
+.btn-eliminar:hover { background: var(--olympo-blood); color: var(--fg-1); }
 
 /* ── Paginación ── */
 .paginacion {
@@ -163,36 +183,120 @@
 
 .btn-pagina-nav {
   padding: 6px 14px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #fff;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-sm);
+  background: var(--bg-3);
+  color: var(--fg-2);
   cursor: pointer;
   font-size: 13px;
+  font-family: var(--font-body);
+  transition: background var(--t-fast);
 }
 
-.btn-pagina-nav:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
+.btn-pagina-nav:disabled { cursor: not-allowed; opacity: 0.4; }
+.btn-pagina-nav:not(:disabled):hover { background: var(--bg-2); color: var(--fg-1); }
 
 .btn-pagina-num {
   padding: 6px 11px;
-  border: 1px solid #007bff;
-  border-radius: 4px;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-sm);
   cursor: pointer;
   font-size: 13px;
-  background-color: #fff;
-  color: #007bff;
-  transition: all 0.15s;
+  font-family: var(--font-body);
+  background: var(--bg-3);
+  color: var(--fg-2);
+  transition: all var(--t-fast);
 }
 
 .btn-pagina-num.activo {
-  background-color: #007bff;
-  color: #fff;
+  background: var(--olympo-lime);
+  color: var(--fg-on-accent);
+  border-color: var(--olympo-lime);
+  font-weight: 700;
 }
+
+.btn-pagina-num:not(.activo):hover { background: var(--bg-2); color: var(--fg-1); }
 
 .paginacion-info {
   margin-left: 8px;
   font-size: 13px;
-  color: #666;
+  color: var(--fg-3);
 }
+
+/* ── Resumen por sabor ── */
+.resumen-sabores {
+  margin-bottom: 20px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+}
+
+.resumen-sabores-titulo {
+  margin: 0 0 12px;
+  font-family: var(--font-headline);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-3);
+}
+
+.resumen-sabores-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.sabor-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
+  padding: 10px 16px;
+  min-width: 110px;
+  transition: border-color var(--t-fast);
+}
+
+.sabor-card:hover { border-color: var(--olympo-lime); }
+
+.sabor-nombre {
+  font-family: var(--font-headline);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-1);
+  text-align: center;
+}
+
+.sabor-stock {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--olympo-lime);
+}
+
+.sabor-variantes { font-size: 11px; color: var(--fg-3); }
+
+/* ── Imagen en tabla de productos ── */
+.td-imagen-producto { width: 70px; text-align: center; vertical-align: middle; padding: 6px !important; }
+.producto-thumb { width: 52px; height: 52px; object-fit: cover; border-radius: var(--r-md); border: 1px solid var(--border-1); display: block; margin: 0 auto; }
+.badge-sin-imagen { font-size: 0.68rem; color: var(--fg-3); background: var(--bg-3); border: 1px solid var(--border-1); border-radius: var(--r-sm); padding: 2px 6px; white-space: nowrap; }
+
+.imagen-upload-trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto;
+  border-radius: var(--r-md);
+  transition: opacity var(--t-fast), box-shadow var(--t-fast);
+}
+.imagen-upload-trigger:hover { opacity: 0.75; box-shadow: 0 0 0 2px var(--olympo-lime); }
+.imagen-upload-trigger.sin-imagen {
+  border: 1px dashed var(--border-1);
+  background: var(--bg-3);
+}
+.imagen-subiendo { font-size: 0.7rem; color: var(--fg-3); }

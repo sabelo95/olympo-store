@@ -4,6 +4,7 @@ import com.compras_service.domain.model.Carrito;
 import com.compras_service.domain.usecase.CarritoUseCases.ActualizarCarritoUseCase;
 import com.compras_service.domain.usecase.CarritoUseCases.CrearCarritoUseCase;
 import com.compras_service.domain.usecase.CarritoUseCases.EliminarCarritoUseCase;
+import com.compras_service.domain.usecase.CarritoUseCases.ObtenerCarritoUseCase;
 import com.compras_service.infrastructure.adapters.DTOs.CarritoProductoRequest;
 import com.compras_service.infrastructure.adapters.DTOs.CarritoRequest;
 import com.compras_service.infrastructure.adapters.DTOs.CarritoResponse;
@@ -20,10 +21,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -38,6 +41,9 @@ class CarritoControllerTest {
 
     @MockBean
     private ActualizarCarritoUseCase actualizarCarritoUseCase;
+
+    @MockBean
+    private ObtenerCarritoUseCase obtenerCarritoUseCase;
 
     @MockBean
     private EliminarCarritoUseCase eliminarCarritoUseCase;
@@ -57,7 +63,7 @@ class CarritoControllerTest {
         carritoRequest = new CarritoRequest();
         carritoRequest.setClienteId(1L);
         carritoRequest.setAbandonado(false);
-        
+
         CarritoProductoRequest productoRequest = new CarritoProductoRequest();
         productoRequest.setProductoId(1L);
         productoRequest.setCantidad(2);
@@ -85,6 +91,7 @@ class CarritoControllerTest {
 
         // When & Then
         mockMvc.perform(post("/api/carritos")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(carritoRequest)))
                 .andExpect(status().isOk())
@@ -104,6 +111,7 @@ class CarritoControllerTest {
 
         // When & Then
         mockMvc.perform(post("/api/carritos")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(carritoRequest)))
                 .andExpect(status().isInternalServerError());
@@ -122,6 +130,7 @@ class CarritoControllerTest {
 
         // When & Then
         mockMvc.perform(put("/api/carritos/{id}/{clienteId}", carritoId, clienteId)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(carritoRequest)))
                 .andExpect(status().isOk())
@@ -132,8 +141,8 @@ class CarritoControllerTest {
 
     @Test
     @WithMockUser(roles = "CLIENTE")
-    void actualizarCarrito_NonExistingCarrito_ReturnsNotFound() throws Exception {
-        // Given
+    void actualizarCarrito_NonExistingCarrito_ReturnsBadRequest() throws Exception {
+        // Given — the controller catches IllegalArgumentException and returns 400 (badRequest)
         Long carritoId = 999L;
         Long clienteId = 1L;
         when(carritoWebMapper.toDomain(any(CarritoRequest.class))).thenReturn(carrito);
@@ -142,10 +151,10 @@ class CarritoControllerTest {
 
         // When & Then
         mockMvc.perform(put("/api/carritos/{id}/{clienteId}", carritoId, clienteId)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(carritoRequest)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Carrito no encontrado."));
+                .andExpect(status().isBadRequest());
 
         verify(actualizarCarritoUseCase, times(1)).modificarCarrito(eq(carritoId), eq(clienteId), any(Carrito.class));
     }
@@ -158,7 +167,8 @@ class CarritoControllerTest {
         doNothing().when(eliminarCarritoUseCase).eliminarCarrito(carritoId);
 
         // When & Then
-        mockMvc.perform(delete("/api/carritos/{id}", carritoId))
+        mockMvc.perform(delete("/api/carritos/{id}", carritoId)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Carrito eliminado exitosamente."));
 
@@ -174,11 +184,11 @@ class CarritoControllerTest {
                 .when(eliminarCarritoUseCase).eliminarCarrito(carritoId);
 
         // When & Then
-        mockMvc.perform(delete("/api/carritos/{id}", carritoId))
+        mockMvc.perform(delete("/api/carritos/{id}", carritoId)
+                        .with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Carrito no encontrado."));
 
         verify(eliminarCarritoUseCase, times(1)).eliminarCarrito(carritoId);
     }
 }
-

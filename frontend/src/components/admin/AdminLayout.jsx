@@ -1,13 +1,21 @@
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import "../../styles/AdminLayout.css";
 
 function AdminLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [sidebarAbierto, setSidebarAbierto] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     navigate("/");
+  };
+
+  const navegar = (path) => {
+    navigate(path);
+    setSidebarAbierto(false);
   };
 
   const menuItems = [
@@ -24,76 +32,42 @@ function AdminLayout({ children }) {
   ];
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      {/* Sidebar */}
-      <div style={{
-        width: "250px",
-        backgroundColor: "#2c3e50",
-        color: "white",
-        padding: "20px",
-        display: "flex",
-        flexDirection: "column"
-      }}>
-        <h2 style={{ marginBottom: "30px", textAlign: "center" }}>
-          Panel Admin
-        </h2>
+    <div className="admin-shell">
+      {/* Mobile topbar */}
+      <div className="admin-topbar">
+        <button className="btn-hamburger" onClick={() => setSidebarAbierto(true)}>☰</button>
+        <span className="admin-topbar-titulo">Panel Admin</span>
+      </div>
 
-        <nav style={{ flex: 1 }}>
+      {/* Overlay (mobile only) */}
+      {sidebarAbierto && (
+        <div className="admin-overlay" onClick={() => setSidebarAbierto(false)} />
+      )}
+
+      <aside className={`admin-sidebar${sidebarAbierto ? " abierto" : ""}`}>
+        <div className="admin-sidebar-header">
+          <h2 className="admin-sidebar-title">Panel Admin</h2>
+          <button className="btn-sidebar-cerrar" onClick={() => setSidebarAbierto(false)}>✕</button>
+        </div>
+        <nav className="admin-nav">
           {menuItems.map(item => (
             <button
               key={item.path}
-              onClick={() => navigate(item.path)}
-              style={{
-                width: "100%",
-                padding: "12px 15px",
-                marginBottom: "10px",
-                backgroundColor: location.pathname === item.path ? "#34495e" : "transparent",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                textAlign: "left",
-                fontSize: "16px",
-                transition: "background-color 0.3s"
-              }}
-              onMouseEnter={(e) => {
-                if (location.pathname !== item.path) {
-                  e.target.style.backgroundColor = "#34495e";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (location.pathname !== item.path) {
-                  e.target.style.backgroundColor = "transparent";
-                }
-              }}
+              onClick={() => navegar(item.path)}
+              className={`admin-nav-btn${location.pathname === item.path ? " active" : ""}`}
             >
               {item.label}
             </button>
           ))}
         </nav>
-
-        <button
-          onClick={handleLogout}
-          style={{
-            width: "100%",
-            padding: "12px 15px",
-            backgroundColor: "#e74c3c",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            fontSize: "16px",
-            marginTop: "auto"
-          }}
-        >
+        <button className="admin-logout-btn" onClick={handleLogout}>
           Cerrar Sesión
         </button>
-      </div>
+      </aside>
 
-      {/* Content */}
-      <div style={{ flex: 1, backgroundColor: "#ecf0f1" }}>
+      <main className="admin-content">
         {children}
-      </div>
+      </main>
     </div>
   );
 }

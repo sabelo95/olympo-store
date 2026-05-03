@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -86,7 +87,8 @@ class ClienteControllerTest {
         when(clienteWebMapper.toResponse(any(Cliente.class))).thenReturn(clienteResponse);
 
         // When & Then
-        mockMvc.perform(post("/api/v1/clientes")
+        mockMvc.perform(post("/api/clientes")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clienteRequest)))
                 .andExpect(status().isOk())
@@ -106,7 +108,8 @@ class ClienteControllerTest {
                 .thenThrow(new IllegalArgumentException("NIT duplicado"));
 
         // When & Then
-        mockMvc.perform(post("/api/v1/clientes")
+        mockMvc.perform(post("/api/clientes")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clienteRequest)))
                 .andExpect(status().isBadRequest());
@@ -123,7 +126,7 @@ class ClienteControllerTest {
         when(clienteWebMapper.toResponse(any(Cliente.class))).thenReturn(clienteResponse);
 
         // When & Then
-        mockMvc.perform(get("/api/v1/clientes/{nit}", nit))
+        mockMvc.perform(get("/api/clientes/{nit}", nit))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.nit").value("123456789"));
@@ -140,7 +143,7 @@ class ClienteControllerTest {
                 .thenThrow(new IllegalArgumentException("Cliente no encontrado"));
 
         // When & Then
-        mockMvc.perform(get("/api/v1/clientes/{nit}", nit))
+        mockMvc.perform(get("/api/clientes/{nit}", nit))
                 .andExpect(status().isNotFound());
 
         verify(obtenerClienteUseCase, times(1)).obtenerPorNit(nit);
@@ -152,10 +155,11 @@ class ClienteControllerTest {
         // Given
         String nit = "123456789";
         when(clienteWebMapper.toDomain(any(ClienteRequest.class))).thenReturn(cliente);
-        doNothing().when(actualizarClienteUseCase).actualizarCliente(any(Cliente.class));
+        when(actualizarClienteUseCase.actualizarCliente(any(Cliente.class))).thenReturn(cliente);
 
         // When & Then
-        mockMvc.perform(put("/api/v1/clientes/{nit}", nit)
+        mockMvc.perform(put("/api/clientes/{nit}", nit)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clienteRequest)))
                 .andExpect(status().isOk())
@@ -174,11 +178,12 @@ class ClienteControllerTest {
                 .when(actualizarClienteUseCase).actualizarCliente(any(Cliente.class));
 
         // When & Then
-        mockMvc.perform(put("/api/v1/clientes/{nit}", nit)
+        mockMvc.perform(put("/api/clientes/{nit}", nit)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clienteRequest)))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Cliente no encontrado."));
+                .andExpect(content().string("Cliente no encontrado"));
 
         verify(actualizarClienteUseCase, times(1)).actualizarCliente(any(Cliente.class));
     }
@@ -191,7 +196,8 @@ class ClienteControllerTest {
         doNothing().when(eliminarClienteUseCase).eliminarCliente(nit);
 
         // When & Then
-        mockMvc.perform(delete("/api/v1/clientes/{nit}", nit))
+        mockMvc.perform(delete("/api/clientes/{nit}", nit)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Cliente eliminado exitosamente."));
 
@@ -207,11 +213,11 @@ class ClienteControllerTest {
                 .when(eliminarClienteUseCase).eliminarCliente(nit);
 
         // When & Then
-        mockMvc.perform(delete("/api/v1/clientes/{nit}", nit))
+        mockMvc.perform(delete("/api/clientes/{nit}", nit)
+                        .with(csrf()))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Cliente no encontrado."));
+                .andExpect(content().string("Cliente no encontrado"));
 
         verify(eliminarClienteUseCase, times(1)).eliminarCliente(nit);
     }
 }
-

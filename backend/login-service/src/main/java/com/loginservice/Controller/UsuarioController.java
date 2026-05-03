@@ -4,6 +4,8 @@ import com.loginservice.DTO.CrearUsuarioRequest;
 import com.loginservice.DTO.UsuarioDTO;
 import com.loginservice.DTO.UsuarioResponse;
 import com.loginservice.Model.Usuario;
+import com.loginservice.Service.LoginRateLimiterService;
+import com.loginservice.Service.TokenBlacklistService;
 import com.loginservice.Service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +30,15 @@ import java.util.Map;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final LoginRateLimiterService rateLimiter;
+    private final TokenBlacklistService blacklist;
 
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService,
+                             LoginRateLimiterService rateLimiter,
+                             TokenBlacklistService blacklist) {
         this.usuarioService = usuarioService;
+        this.rateLimiter = rateLimiter;
+        this.blacklist = blacklist;
     }
 
     @Operation(
@@ -59,10 +68,27 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UsuarioDTO usuarioDTO) {
-        String correo = usuarioDTO.getCorreo();
-        String contrasena = usuarioDTO.getContrasena();
-        return usuarioService.login(correo, contrasena);
+    public ResponseEntity<?> login(@RequestBody UsuarioDTO usuarioDTO, HttpServletRequest request) {
+        String ip = obtenerIp(request);
+        if (!rateLimiter.permitir(ip)) {
+            return ResponseEntity.status(429).body("Demasiados intentos de inicio de sesión. Intente en 15 minutos.");
+        }
+        return usuarioService.login(usuarioDTO.getCorreo(), usuarioDTO.getContrasena());
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody(required = false) Map<String, String> body) {
+        if (body != null && body.containsKey("refreshToken")) {
+            blacklist.invalidar(body.get("refreshToken"));
+        }
+        return ResponseEntity.noContent().build();
+    }
+
+    private String obtenerIp(HttpServletRequest request) {
+        String forwarded = request.getHeader("X-Forwarded-For");
+        return (forwarded != null && !forwarded.isBlank())
+                ? forwarded.split(",")[0].trim()
+                : request.getRemoteAddr();
     }
 
     @PostMapping("/crear")
@@ -142,7 +168,11 @@ public class UsuarioController {
     })
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody Map<String, String> request) {
-        return usuarioService.refreshToken(request.get("refreshToken"));
+        String token = request.get("refreshToken");
+        if (blacklist.estaInvalidado(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sesión cerrada. Inicie sesión nuevamente.");
+        }
+        return usuarioService.refreshToken(token);
     }
 
     @Operation(summary = "Listar todos los usuarios", description = "Retorna la lista completa de usuarios registrados")

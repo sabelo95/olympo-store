@@ -2,36 +2,40 @@
   padding: 30px 20px;
   max-width: 800px;
   margin: 0 auto;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--font-body);
+  color: var(--fg-1);
 }
 
 .agregar-producto h1 {
-  color: #1a1a2e;
+  font-family: var(--font-headline);
+  color: var(--fg-1);
   margin-bottom: 24px;
   font-size: 26px;
+  letter-spacing: 0.02em;
 }
 
 /* ── Error ── */
 .alerta-error {
-  padding: 14px 16px;
-  background-color: #f8d7da;
-  color: #721c24;
-  border-radius: 6px;
+  padding: 12px 16px;
+  background: rgba(255,46,46,0.1);
+  color: var(--olympo-blood);
+  border: 1px solid rgba(255,46,46,0.3);
+  border-radius: var(--r-md);
   margin-bottom: 20px;
   font-size: 14px;
 }
 
 /* ── Grupos de formulario ── */
-.form-group {
-  margin-bottom: 20px;
-}
+.form-group { margin-bottom: 20px; }
 
 .form-group label {
   display: block;
   margin-bottom: 6px;
-  font-weight: 500;
-  font-size: 14px;
-  color: #444;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .form-group input,
@@ -39,39 +43,30 @@
 .form-group select {
   width: 100%;
   padding: 9px 12px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-1);
   font-size: 14px;
-  font-family: inherit;
+  font-family: var(--font-body);
   box-sizing: border-box;
-  transition: border-color 0.2s;
+  background: var(--bg-3);
+  color: var(--fg-1);
+  transition: border-color var(--t-fast);
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+  border-color: var(--olympo-lime);
+  box-shadow: 0 0 0 2px rgba(198,255,0,0.1);
 }
 
-.form-group textarea {
-  resize: vertical;
-  min-height: 100px;
-}
+.form-group select option { background: var(--bg-3); color: var(--fg-1); }
+.form-group textarea { resize: vertical; min-height: 100px; }
 
 /* ── Grids ── */
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
 @media (max-width: 600px) {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
@@ -79,51 +74,48 @@
 
 /* ── Sección imágenes ── */
 .seccion-imagenes {
-  background-color: #f8f9fa;
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
   padding: 20px;
-  border-radius: 10px;
+  border-radius: var(--r-lg);
   margin-bottom: 24px;
 }
 
 .seccion-imagenes h3 {
   margin-top: 0;
   margin-bottom: 16px;
-  color: #1a1a2e;
-  font-size: 16px;
+  font-family: var(--font-headline);
+  color: var(--fg-2);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
-.seccion-imagenes .nota {
-  font-size: 12px;
-  color: #888;
-  margin-top: 10px;
-}
+.seccion-imagenes .nota { font-size: 12px; color: var(--fg-3); margin-top: 10px; }
 
 /* ── Preview imagen ── */
 .btn-subir-imagen {
   display: inline-block;
-  padding: 10px 20px;
-  color: white;
-  border-radius: 6px;
+  padding: 9px 18px;
+  border-radius: var(--r-md);
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
-  transition: opacity 0.2s;
+  font-weight: 600;
+  transition: opacity var(--t-fast);
+  border: 1px solid;
 }
 
-.btn-subir-imagen:hover { opacity: 0.85; }
-.btn-subir-imagen.general     { background-color: #007bff; }
-.btn-subir-imagen.nutricional { background-color: #28a745; }
+.btn-subir-imagen:hover { opacity: 0.8; }
+.btn-subir-imagen.general     { background: transparent; color: var(--olympo-lime); border-color: var(--olympo-lime); }
+.btn-subir-imagen.nutricional { background: transparent; color: var(--olympo-info); border-color: var(--olympo-info); }
 
-.preview-wrapper {
-  position: relative;
-  display: inline-block;
-}
+.preview-wrapper { position: relative; display: inline-block; }
 
 .preview-wrapper img {
   max-width: 300px;
   max-height: 300px;
-  border-radius: 8px;
-  border: 2px solid #ddd;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-1);
   display: block;
 }
 
@@ -131,7 +123,7 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  background-color: #dc3545;
+  background: var(--olympo-blood);
   color: white;
   border: none;
   border-radius: 50%;
@@ -155,32 +147,31 @@
 
 .btn-cancelar {
   padding: 10px 22px;
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  background: var(--bg-3);
+  color: var(--fg-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
   cursor: pointer;
   font-size: 14px;
+  font-family: var(--font-body);
   font-weight: 500;
+  transition: background var(--t-fast), color var(--t-fast);
 }
+
+.btn-cancelar:hover { background: var(--bg-2); color: var(--fg-1); }
 
 .btn-guardar {
   padding: 10px 22px;
-  background-color: #28a745;
-  color: white;
+  background: var(--olympo-lime);
+  color: var(--fg-on-accent);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--r-md);
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  font-family: var(--font-body);
+  font-weight: 700;
+  transition: opacity var(--t-fast);
 }
 
-.btn-guardar:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.btn-guardar:hover:not(:disabled) {
-  background-color: #218838;
-}
+.btn-guardar:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-guardar:hover:not(:disabled) { opacity: 0.85; }

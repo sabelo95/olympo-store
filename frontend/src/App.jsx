@@ -182,6 +182,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/admin/productos/editar/id/:id"
+          element={
+            <ProtectedRoute allowedRoles={["ADMINISTRADOR"]}>
+              <AdminLayout>
+                <EditarProducto />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

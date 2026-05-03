@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/sabores")
-@CrossOrigin(origins = "*")
 @AllArgsConstructor
 public class SaborController {
 

@@ -122,7 +122,26 @@ public class ProductoController {
         return ResponseEntity.ok(producto);
     }
 
+    @GetMapping("/id/{id}")
+    public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
+        Producto producto = productoService.obtenerProductoPorId(id);
+        if (producto == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado con id: " + id);
+        return ResponseEntity.ok(producto);
+    }
 
+    @PutMapping("/id/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<?> actualizarPorId(
+            @PathVariable Long id,
+            @RequestBody @Valid RequestProductoDto productoDto) {
+        try {
+            Producto actualizado = productoService.actualizarProductoPorId(id, productoDto);
+            return ResponseEntity.ok(actualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMINISTRADOR')")
@@ -174,7 +193,11 @@ public class ProductoController {
     public ResponseEntity<?> actualizarProducto(
             @Parameter(description = "Nombre del producto a actualizar", required = true, example = "Laptop Dell")
             @PathVariable String nombre,
-            @Valid @RequestBody RequestProductoDto productoDto) {
+            @Valid @RequestPart("producto") RequestProductoDto productoDto,
+            @RequestPart(value = "imagenGeneral", required = false) MultipartFile imagenGeneral,
+            @RequestPart(value = "imagenNutricional", required = false) MultipartFile imagenNutricional,
+            @RequestParam(value = "eliminarImagenGeneral", required = false, defaultValue = "false") boolean eliminarImagenGeneral,
+            @RequestParam(value = "eliminarImagenNutricional", required = false, defaultValue = "false") boolean eliminarImagenNutricional) {
 
         Producto productoExistente = productoService.obtenerProductoPorNombre(nombre);
         if (productoExistente == null) {
@@ -182,26 +205,88 @@ public class ProductoController {
                     .body("El producto con nombre '" + nombre + "' no existe.");
         }
 
+        try {
+            if (imagenGeneral != null && !imagenGeneral.isEmpty()) {
+                productoDto.setImagenGeneral(fileUploadService.guardarImagen(imagenGeneral, "generales"));
+            } else if (eliminarImagenGeneral) {
+                productoDto.setImagenGeneral(null);
+            } else {
+                productoDto.setImagenGeneral(productoExistente.getImagenGeneral());
+            }
+            if (imagenNutricional != null && !imagenNutricional.isEmpty()) {
+                productoDto.setImagenNutricional(fileUploadService.guardarImagen(imagenNutricional, "nutricionales"));
+            } else if (eliminarImagenNutricional) {
+                productoDto.setImagenNutricional(null);
+            } else {
+                productoDto.setImagenNutricional(productoExistente.getImagenNutricional());
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al guardar las imágenes: " + e.getMessage());
+        }
+
         Producto actualizado = productoService.actualizarProducto(nombre, productoDto);
         return ResponseEntity.ok(actualizado);
     }
 
-
-
-    @DeleteMapping("/{nombre}")
+    @PutMapping(value = "/id/{id}/editar")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    @Operation(summary = "Eliminar producto", description = "Elimina un producto del sistema por su nombre. Requiere rol de ADMINISTRADOR")
+    public ResponseEntity<?> actualizarPorIdConImagenes(
+            @PathVariable Long id,
+            @Valid @RequestPart("producto") RequestProductoDto productoDto,
+            @RequestPart(value = "imagenGeneral", required = false) MultipartFile imagenGeneral,
+            @RequestPart(value = "imagenNutricional", required = false) MultipartFile imagenNutricional,
+            @RequestParam(value = "eliminarImagenGeneral", required = false, defaultValue = "false") boolean eliminarImagenGeneral,
+            @RequestParam(value = "eliminarImagenNutricional", required = false, defaultValue = "false") boolean eliminarImagenNutricional) {
+
+        Producto existente = productoService.obtenerProductoPorId(id);
+        if (existente == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado con id: " + id);
+
+        try {
+            if (imagenGeneral != null && !imagenGeneral.isEmpty()) {
+                productoDto.setImagenGeneral(fileUploadService.guardarImagen(imagenGeneral, "generales"));
+            } else if (eliminarImagenGeneral) {
+                productoDto.setImagenGeneral(null);
+            } else {
+                productoDto.setImagenGeneral(existente.getImagenGeneral());
+            }
+            if (imagenNutricional != null && !imagenNutricional.isEmpty()) {
+                productoDto.setImagenNutricional(fileUploadService.guardarImagen(imagenNutricional, "nutricionales"));
+            } else if (eliminarImagenNutricional) {
+                productoDto.setImagenNutricional(null);
+            } else {
+                productoDto.setImagenNutricional(existente.getImagenNutricional());
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al guardar las imágenes: " + e.getMessage());
+        }
+
+        try {
+            Producto actualizado = productoService.actualizarProductoPorId(id, productoDto);
+            return ResponseEntity.ok(actualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+
+    @DeleteMapping("/id/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @Operation(summary = "Eliminar producto por ID", description = "Elimina un producto del sistema por su ID. Requiere rol de ADMINISTRADOR")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Producto eliminado exitosamente"),
             @ApiResponse(responseCode = "404", description = "Producto no encontrado"),
             @ApiResponse(responseCode = "403", description = "No autorizado - Se requiere rol ADMINISTRADOR"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+            @ApiResponse(responseCode = "409", description = "El producto tiene registros asociados")
     })
     public ResponseEntity<?> eliminarProducto(
-            @Parameter(description = "Nombre del producto a eliminar", required = true, example = "Laptop Dell")
-            @PathVariable String nombre) {
+            @Parameter(description = "ID del producto a eliminar", required = true)
+            @PathVariable Long id) {
         try {
-            productoService.eliminarProducto(nombre);
+            productoService.eliminarProductoPorId(id);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

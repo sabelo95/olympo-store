@@ -156,9 +156,9 @@ public class ActualizarPedidoUseCase {
         switch (nuevoEstado) {
             case EN_PROCESO -> {
                 color = "#d69e2e";
-                icono = "&#9201;";
-                titulo = "Tu pedido está en proceso";
-                descripcion = "Estamos preparando tu pedido. Te notificaremos cuando esté listo para envío.";
+                icono = "&#128666;";
+                titulo = "¡Tu pedido está en camino!";
+                descripcion = "Tu pedido ya fue despachado y está en proceso de envío. Pronto llegará a tu puerta.";
             }
             case COMPLETADO -> {
                 color = "#38a169";

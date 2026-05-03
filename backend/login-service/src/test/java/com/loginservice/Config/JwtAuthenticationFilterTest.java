@@ -14,10 +14,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -47,7 +44,7 @@ class JwtAuthenticationFilterTest {
         // Given
         String token = "validToken123";
         request.addHeader("Authorization", "Bearer " + token);
-        
+
         when(jwtUtil.validarToken(token)).thenReturn(true);
         when(jwtUtil.obtenerCorreoDesdeToken(token)).thenReturn("test@test.com");
         when(jwtUtil.obtenerRolDesdeToken(token)).thenReturn("ADMINISTRADOR");
@@ -67,7 +64,7 @@ class JwtAuthenticationFilterTest {
         // Given
         String token = "invalidToken123";
         request.addHeader("Authorization", "Bearer " + token);
-        
+
         when(jwtUtil.validarToken(token)).thenReturn(false);
 
         // When
@@ -92,7 +89,7 @@ class JwtAuthenticationFilterTest {
     @Test
     void doFilterInternal_NoBearerPrefix_NoAuthenticationSet() throws Exception {
         // Given
-        request.addHeader("Authorization", "Invalid " + "someToken");
+        request.addHeader("Authorization", "Invalid someToken");
 
         // When
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
@@ -119,7 +116,7 @@ class JwtAuthenticationFilterTest {
         // Given
         String token = "validToken";
         request.addHeader("Authorization", "Bearer " + token);
-        
+
         when(jwtUtil.validarToken(token)).thenReturn(true);
         when(jwtUtil.obtenerCorreoDesdeToken(token)).thenReturn("admin@test.com");
         when(jwtUtil.obtenerRolDesdeToken(token)).thenReturn("ADMINISTRADOR");
@@ -131,8 +128,6 @@ class JwtAuthenticationFilterTest {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         assertNotNull(authentication);
         assertTrue(authentication.getAuthorities().stream()
-            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMINISTRADOR")));
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMINISTRADOR")));
     }
 }
-
-

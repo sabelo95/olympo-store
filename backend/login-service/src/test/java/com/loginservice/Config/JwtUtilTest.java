@@ -2,13 +2,12 @@ package com.loginservice.Config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.security.Key;
 import java.util.Base64;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,8 +18,9 @@ class JwtUtilTest {
 
     @BeforeEach
     void setUp() {
-        // Generate a test secret
-        testSecret = Base64.getEncoder().encodeToString("test-secret-key-for-jwt-testing-purposes-only".getBytes());
+        // Must be at least 256 bits (32 bytes) for HS256
+        testSecret = Base64.getEncoder().encodeToString(
+                "test-secret-key-for-jwt-testing-purposes-only-1234".getBytes());
         jwtUtil = new JwtUtil(testSecret);
     }
 
@@ -32,19 +32,19 @@ class JwtUtilTest {
         Long id = 123L;
 
         // When
-        String token = jwtUtil.generarAccessToken(correo, rol,id);
+        String token = jwtUtil.generarAccessToken(correo, rol, id);
 
         // Then
         assertNotNull(token);
         assertFalse(token.isEmpty());
-        
+
         // Verify token can be parsed
         Claims claims = Jwts.parserBuilder()
-            .setSigningKey(generateKey())
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
-        
+                .setSigningKey(generateKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
         assertEquals(correo, claims.getSubject());
         assertEquals(rol, claims.get("rol"));
     }
@@ -60,14 +60,14 @@ class JwtUtilTest {
         // Then
         assertNotNull(token);
         assertFalse(token.isEmpty());
-        
+
         // Verify token can be parsed
         Claims claims = Jwts.parserBuilder()
-            .setSigningKey(generateKey())
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
-        
+                .setSigningKey(generateKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
         assertEquals(correo, claims.getSubject());
     }
 
@@ -125,18 +125,16 @@ class JwtUtilTest {
 
     @Test
     void validarToken_ExpiredToken_ReturnsFalse() {
-        // Given
-        JwtUtil expiredJwtUtil = new JwtUtil(testSecret);
-        // Create a token with very short expiration
+        // Given — build an already-expired token using the same key
         Key key = generateKey();
         String expiredToken = Jwts.builder()
-            .setSubject("test@test.com")
-            .setExpiration(new java.util.Date(System.currentTimeMillis() - 1000))
-            .signWith(key)
-            .compact();
+                .setSubject("test@test.com")
+                .setExpiration(new java.util.Date(System.currentTimeMillis() - 1000))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
 
         // When
-        boolean result = expiredJwtUtil.validarToken(expiredToken);
+        boolean result = jwtUtil.validarToken(expiredToken);
 
         // Then
         assertFalse(result);
@@ -150,7 +148,6 @@ class JwtUtilTest {
         String rol2 = "USER";
         Long id = 123L;
 
-
         // When
         String token1 = jwtUtil.generarAccessToken(correo, rol1, id);
         String token2 = jwtUtil.generarAccessToken(correo, rol2, id);
@@ -161,10 +158,10 @@ class JwtUtilTest {
         assertEquals(rol2, jwtUtil.obtenerRolDesdeToken(token2));
     }
 
+    // ── helper ────────────────────────────────────────────────────────────────
+
     private Key generateKey() {
         byte[] keyBytes = Base64.getDecoder().decode(testSecret);
         return io.jsonwebtoken.security.Keys.hmacShaKeyFor(keyBytes);
     }
 }
-
-

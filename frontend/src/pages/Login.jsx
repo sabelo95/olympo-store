@@ -11,9 +11,11 @@ const Login = () => {
       {mensaje && (
         <div style={{
           position: "fixed", top: "20px", left: "50%", transform: "translateX(-50%)",
-          backgroundColor: "#fff3cd", color: "#856404", padding: "12px 24px",
-          borderRadius: "8px", fontSize: "14px", fontWeight: "500",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.15)", zIndex: 1000,
+          background: "rgba(245,166,35,0.12)", color: "var(--olympo-gold)",
+          border: "1px solid rgba(245,166,35,0.3)",
+          padding: "12px 24px", borderRadius: "var(--r-md)",
+          fontSize: "14px", fontWeight: "500", zIndex: 1000,
+          backdropFilter: "blur(8px)",
         }}>
           {mensaje}
         </div>

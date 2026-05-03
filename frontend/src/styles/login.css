@@ -1,183 +1,203 @@
-/* ── Página de login ── */
+/* ============================================================
+   OLYMPO STORE — Login / Registro
+   Dark, gladiator-fueled. Tokens from design-tokens.css
+   ============================================================ */
+
+/* Page */
 .login-page {
   min-height: 100vh;
-  background: #f0f2f5;
+  background: var(--bg-0);
   display: flex;
   flex-direction: column;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--font-body);
 }
 
+/* Navbar */
 .login-navbar {
-  background: #1a1a2e;
-  padding: 12px 24px;
+  background: rgba(5,5,5,0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-1);
+  padding: 0 28px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-
 .login-navbar-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   cursor: pointer;
 }
-
 .login-navbar-logo-nav {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
+  width: 38px; height: 38px; border-radius: 50%; object-fit: cover;
+  filter: invert(1); box-shadow: 0 0 0 1.5px var(--olympo-lime);
 }
-
 .login-navbar-nombre {
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
+  font-family: var(--font-display); font-weight: 900; font-size: 20px;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--fg-1);
 }
-
 .login-navbar-back {
-  color: rgba(255,255,255,0.7);
-  font-size: 13px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  transition: color 0.2s;
-  font-family: inherit;
+  font-family: var(--font-headline); font-weight: 600; font-size: 12px;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--fg-3); background: none; border: none; cursor: pointer;
+  transition: color var(--t-fast); font-family: inherit; padding: 0;
 }
-.login-navbar-back:hover { color: white; }
+.login-navbar-back:hover { color: var(--olympo-lime); }
 
-/* ── Cuerpo central ── */
+/* Body */
 .login-body {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
+  background: var(--bg-0);
+  position: relative;
+}
+.login-body::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 14px);
+  pointer-events: none;
 }
 
+/* Card */
 .login-card {
-  background: white;
-  border-radius: 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-lg);
   padding: 40px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-3);
+  position: relative;
+  z-index: 1;
 }
-
 .login-card-header {
   text-align: center;
   margin-bottom: 28px;
 }
-
 .login-logo {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 12px;
-}
-
-.login-card-header h1 {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1a1a2e;
-  margin: 0 0 6px 0;
-}
-
-.login-card-header p {
-  font-size: 14px;
-  color: #888;
-  margin: 0;
-}
-
-/* ── Inputs ── */
-.login-input {
+  width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+  filter: invert(1); box-shadow: 0 0 0 2px var(--olympo-lime), var(--glow-lime);
   margin-bottom: 16px;
 }
+.login-card-header h1 {
+  font-family: var(--font-display); font-weight: 900; font-size: 28px;
+  text-transform: uppercase; letter-spacing: 0.02em; color: var(--fg-1);
+  margin: 0 0 6px;
+}
+.login-card-header p { font-size: 13px; color: var(--fg-3); margin: 0; }
 
+/* Inputs */
+.login-input { margin-bottom: 14px; }
 .login-input input {
   width: 100%;
-  padding: 10px 14px;
-  border: 1.5px solid #ddd;
-  border-radius: 8px;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border-1);
+  border-radius: var(--r-md);
   font-size: 14px;
-  color: #333;
-  background: #fafafa;
+  color: var(--fg-1);
+  background: var(--bg-1);
   box-sizing: border-box;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color var(--t-fast), background var(--t-fast);
   font-family: inherit;
-}
-
-.login-input input:focus {
   outline: none;
-  border-color: #1a1a2e;
-  background: white;
 }
+.login-input input:focus { border-color: var(--olympo-lime); background: var(--bg-3); }
+.login-input input::placeholder { color: var(--fg-3); }
 
-.login-input input::placeholder {
-  color: #bbb;
-}
-
-/* ── Botón ── */
+/* Button */
 .login-button {
   width: 100%;
-  padding: 12px;
-  background: #e63946;
-  color: white;
+  padding: 13px;
+  background: var(--olympo-lime);
+  color: var(--olympo-black);
   border: none;
-  border-radius: 8px;
-  font-size: 15px;
+  border-radius: var(--r-md);
+  font-family: var(--font-headline);
+  font-size: 14px;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   cursor: pointer;
-  transition: background 0.2s;
-  font-family: inherit;
+  transition: all var(--t-base);
   margin-top: 4px;
 }
-.login-button:hover:not(:disabled) { background: #c1121f; }
-.login-button:disabled { opacity: 0.65; cursor: not-allowed; }
+.login-button:hover:not(:disabled) { background: var(--olympo-lime-glow); box-shadow: var(--glow-lime); }
+.login-button:active:not(:disabled) { transform: scale(0.97); }
+.login-button:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ── Divisor ── */
+/* Divider */
 .login-divider {
   display: flex;
   align-items: center;
   gap: 10px;
   margin: 20px 0 0;
-  color: #bbb;
-  font-size: 13px;
+  color: var(--fg-3);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 .login-divider::before,
 .login-divider::after {
-  content: "";
+  content: '';
   flex: 1;
   height: 1px;
-  background: #eee;
+  background: var(--border-1);
 }
 
-/* ── Footer ── */
+/* Footer links */
 .login-footer {
   text-align: center;
   margin-top: 16px;
   font-size: 13px;
-  color: #888;
+  color: var(--fg-3);
 }
-
 .login-footer span {
-  color: #1a1a2e;
+  color: var(--olympo-lime);
   font-weight: 700;
   cursor: pointer;
+  transition: color var(--t-fast);
 }
-.login-footer span:hover { text-decoration: underline; }
+.login-footer span:hover { color: var(--olympo-lime-glow); text-decoration: underline; }
 
 .login-footer-skip {
   display: block;
   text-align: center;
   margin-top: 12px;
   font-size: 13px;
-  color: #aaa;
+  color: var(--fg-3);
   background: none;
   border: none;
   cursor: pointer;
-  text-decoration: underline;
+  transition: color var(--t-fast);
   font-family: inherit;
 }
-.login-footer-skip:hover { color: #666; }
+.login-footer-skip:hover { color: var(--fg-2); }
+
+/* Error alert */
+.login-error {
+  background: rgba(255,46,46,0.08);
+  border: 1px solid rgba(255,46,46,0.25);
+  border-radius: var(--r-md);
+  color: var(--olympo-blood);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .login-navbar { padding: 0 16px; height: 60px; }
+  .login-card { max-width: min(420px, 92vw); padding: 28px 20px; }
+  .login-body { padding: 20px 16px; }
+}
+
+@media (max-width: 480px) {
+  .login-card { padding: 24px 14px; }
+  .login-input input { font-size: 16px; }
+  .login-button { font-size: 16px; min-height: 44px; touch-action: manipulation; }
+}

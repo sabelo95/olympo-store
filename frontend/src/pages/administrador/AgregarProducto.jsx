@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { crearProductoConImagenes } from "../../services/productoService";
 import { obtenerCategorias } from "../../services/categoriaService";
 import { obtenerMarcas } from "../../services/marcaService";
+import { obtenerSaboresActivos } from "../../services/saborService";
+import { obtenerTamanosActivos } from "../../services/tamanoService";
 import "../../styles/AgregarProducto.css";
 
 const IMAGEN_MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -44,6 +46,8 @@ function AgregarProducto() {
   const navigate = useNavigate();
   const [categorias, setCategorias] = useState([]);
   const [marcas, setMarcas] = useState([]);
+  const [sabores, setSabores] = useState([]);
+  const [tamanos, setTamanos] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState(estadoInicial);
@@ -53,9 +57,12 @@ function AgregarProducto() {
   const [previewNutricional, setPreviewNutricional] = useState(null);
 
   useEffect(() => {
-    Promise.all([obtenerCategorias(), obtenerMarcas()])
-      .then(([cats, marcas]) => { setCategorias(cats); setMarcas(marcas); })
-      .catch(() => setError("Error al cargar categorías y marcas"));
+    Promise.all([obtenerCategorias(), obtenerMarcas(), obtenerSaboresActivos(), obtenerTamanosActivos()])
+      .then(([cats, marcs, sabs, tams]) => {
+        setCategorias(cats); setMarcas(marcs);
+        setSabores(sabs); setTamanos(tams);
+      })
+      .catch(() => setError("Error al cargar datos del formulario"));
   }, []);
 
   const handleInputChange = (e) => {
@@ -130,13 +137,17 @@ function AgregarProducto() {
         <div className="grid-2">
           <div className="form-group">
             <label>Tamaño *</label>
-            <input type="text" name="tamano" value={formData.tamano}
-              onChange={handleInputChange} required placeholder="Ej: 500g, 1kg, 2lb" />
+            <select name="tamano" value={formData.tamano} onChange={handleInputChange} required>
+              <option value="">Seleccione un tamaño</option>
+              {tamanos.map((t) => <option key={t.id} value={t.nombre}>{t.nombre}</option>)}
+            </select>
           </div>
           <div className="form-group">
             <label>Sabor *</label>
-            <input type="text" name="sabor" value={formData.sabor}
-              onChange={handleInputChange} required placeholder="Ej: Chocolate, Vainilla" />
+            <select name="sabor" value={formData.sabor} onChange={handleInputChange} required>
+              <option value="">Seleccione un sabor</option>
+              {sabores.map((s) => <option key={s.id} value={s.nombre}>{s.nombre}</option>)}
+            </select>
           </div>
         </div>
 

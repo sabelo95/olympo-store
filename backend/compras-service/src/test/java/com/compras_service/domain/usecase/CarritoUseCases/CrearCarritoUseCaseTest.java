@@ -5,6 +5,7 @@ import com.compras_service.domain.gateways.ProductoGateway;
 import com.compras_service.domain.model.Carrito;
 import com.compras_service.domain.model.CarritoProducto;
 import com.compras_service.domain.model.Producto;
+import com.compras_service.domain.services.StockService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,23 +26,16 @@ class CrearCarritoUseCaseTest {
     private CarritoGateway carritoGateway;
 
     @Mock
-    private ProductoGateway productoGateway;
+    private StockService stockService;
 
     @InjectMocks
     private CrearCarritoUseCase crearCarritoUseCase;
 
     private Carrito carrito;
     private CarritoProducto carritoProducto;
-    private Producto producto;
 
     @BeforeEach
     void setUp() {
-        producto = new Producto();
-        producto.setId(1L);
-        producto.setNombre("Producto Test");
-        producto.setPrecio(100.0);
-        producto.setCantidad(10);
-
         carritoProducto = new CarritoProducto();
         carritoProducto.setProducto_id(1L);
         carritoProducto.setCantidad(5);
@@ -54,55 +48,52 @@ class CrearCarritoUseCaseTest {
     @Test
     void crearCarrito_ValidCarrito_CreatesCarrito() {
         // Given
-        when(productoGateway.obtenerProductoPorId(List.of(1L)))
-            .thenReturn(Optional.of(List.of(producto)));
+        doNothing().when(stockService).validarCarrito(any(Carrito.class));
+        doNothing().when(stockService).reducirStockDelCarrito(any(Carrito.class));
         when(carritoGateway.crearCarrito(any(Carrito.class))).thenReturn(carrito);
-        doNothing().when(productoGateway).reducirStock(anyMap());
 
         // When
         Carrito result = crearCarritoUseCase.crearCarrito(carrito);
 
         // Then
         assertNotNull(result);
+        verify(stockService).validarCarrito(any(Carrito.class));
+        verify(stockService).reducirStockDelCarrito(any(Carrito.class));
         verify(carritoGateway).crearCarrito(any(Carrito.class));
-        verify(productoGateway).reducirStock(anyMap());
     }
 
     @Test
-    void crearCarrito_InvalidProduct_ThrowsException() {
+    void crearCarrito_StockValidationFails_ThrowsException() {
         // Given
-        when(productoGateway.obtenerProductoPorId(List.of(1L)))
-            .thenReturn(Optional.empty());
+        doThrow(new IllegalArgumentException("Uno o más productos no existen"))
+                .when(stockService).validarCarrito(any(Carrito.class));
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> 
-            crearCarritoUseCase.crearCarrito(carrito));
-    }
+        assertThrows(IllegalArgumentException.class, () ->
+                crearCarritoUseCase.crearCarrito(carrito));
 
-    @Test
-    void crearCarrito_ZeroStock_ThrowsException() {
-        // Given
-        producto.setCantidad(0);
-        when(productoGateway.obtenerProductoPorId(List.of(1L)))
-            .thenReturn(Optional.of(List.of(producto)));
-
-        // When & Then
-        assertThrows(IllegalArgumentException.class, () -> 
-            crearCarritoUseCase.crearCarrito(carrito));
+        verify(carritoGateway, never()).crearCarrito(any(Carrito.class));
     }
 
     @Test
     void crearCarrito_InsufficientStock_ThrowsException() {
         // Given
-        carritoProducto.setCantidad(20); // More than available stock
-        when(productoGateway.obtenerProductoPorId(List.of(1L)))
-            .thenReturn(Optional.of(List.of(producto)));
+        doThrow(new IllegalArgumentException("Stock insuficiente"))
+                .when(stockService).validarCarrito(any(Carrito.class));
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> 
-            crearCarritoUseCase.crearCarrito(carrito));
+        assertThrows(IllegalArgumentException.class, () ->
+                crearCarritoUseCase.crearCarrito(carrito));
+    }
+
+    @Test
+    void crearCarrito_EmptyProducts_ThrowsException() {
+        // Given
+        doThrow(new IllegalArgumentException("El carrito debe tener al menos un producto"))
+                .when(stockService).validarCarrito(any(Carrito.class));
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () ->
+                crearCarritoUseCase.crearCarrito(carrito));
     }
 }
-
-
-

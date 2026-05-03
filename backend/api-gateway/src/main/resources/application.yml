@@ -69,11 +69,39 @@ spring:
             - Path=/reporte/**
 
 
+        # ============= TAMANOS SERVICE =============
+        - id: tamanos-service
+          uri: ${PRODUCTO_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/tamanos/**
+
+
+        # ============= SABORES SERVICE =============
+        - id: sabores-service
+          uri: ${PRODUCTO_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/sabores/**
+
+
+        # ============= VARIANTES SERVICE =============
+        - id: variantes-service
+          uri: ${PRODUCTO_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/variantes-producto/**
+
+
+        # ============= UPLOADS (archivos estáticos) =============
+        - id: uploads-service
+          uri: ${PRODUCTO_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/uploads/**
+
+
         # ============= ORDENES/COMPRAS SERVICE =============
         - id: ordenes-service
           uri: ${COMPRAS_SERVICE_URL:http://localhost:8084}
           predicates:
-            - Path=/api/carritos/**,/api/clientes/**,/api/pedidos/**,/api/reportes/**,/api/health/**
+            - Path=/api/carritos/**,/api/clientes/**,/api/pedidos/**,/api/reportes/**,/api/health/**,/api/dashboard/**,/api/cupones/**,/api/wompi/**
 
 
         # ============= NOTIFICACIONES SERVICE =============
@@ -83,27 +111,40 @@ spring:
             - Path=/notificaciones/**
 
 
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origin-patterns:
+              - "https://olympo-frontend.fly.dev"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowed-headers:
+              - Content-Type
+              - Authorization
+              - X-Requested-With
+            allow-credentials: true
+            max-age: 3600
+
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin, RETAIN_UNIQUE
+        - AddResponseHeader=X-Content-Type-Options, nosniff
+        - AddResponseHeader=X-Frame-Options, DENY
+        - AddResponseHeader=Referrer-Policy, strict-origin-when-cross-origin
+        - AddResponseHeader=Permissions-Policy, camera=(), microphone=(), geolocation=()
+        - "AddResponseHeader=Content-Security-Policy, default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://olympo-gateway.fly.dev https://checkout.wompi.co; frame-src https://checkout.wompi.co; font-src 'self' data:"
 
 
 # ============= CONFIGURACIÓN DE SWAGGER UI EN EL GATEWAY =============
 springdoc:
   api-docs:
-    enabled: true
+    enabled: false
   swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-    disable-swagger-default-url: true
-    urls:
-      - name: Auth Service
-        url: /auth-api-docs
-      - name: Productos Service (incluye Categorías, Marcas y Reportes)
-        url: /productos-api-docs
-      - name: Ordenes Service
-        url: /ordenes-api-docs
-      - name: Notificaciones Service
-        url: /notificaciones-api-docs
+    enabled: false
 
 
 # ============= CONFIGURACIÓN DEL SERVIDOR =============

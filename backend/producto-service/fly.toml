@@ -8,6 +8,9 @@ dockerfile = "Dockerfile"
 SERVER_PORT = "8083"
 SPRING_PROFILES_ACTIVE = "docker"
 JAVA_OPTS = "-Xmx200m -Xms64m -XX:+UseSerialGC"
+FILE_UPLOAD_DIR = "/data/uploads/productos"
+SPRINGDOC_SWAGGER_UI_ENABLED = "false"
+SPRINGDOC_API_DOCS_ENABLED = "false"
 
 [[services]]
 internal_port = 8083
@@ -20,6 +23,10 @@ port = 80
 [[services.ports]]
 handlers = ["tls", "http"]
 port = 443
+
+[mounts]
+source = "olympo_uploads"
+destination = "/data/uploads"
 
 [vm]
 memory = "512mb"

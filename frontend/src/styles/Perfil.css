@@ -1,6 +1,6 @@
 .perfil-page {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--bg-0);
   padding: 32px 16px;
 }
 
@@ -20,7 +20,7 @@
   background: none;
   border: none;
   font-size: 15px;
-  color: #6c757d;
+  color: var(--fg-3);
   cursor: pointer;
   padding: 4px 0;
 }
@@ -28,7 +28,7 @@
 .perfil-header h1 {
   margin: 0;
   font-size: 22px;
-  color: #343a40;
+  color: var(--fg-1);
 }
 
 .perfil-avatar {
@@ -53,14 +53,14 @@
 }
 
 .perfil-avatar p {
-  color: #6c757d;
+  color: var(--fg-3);
   font-size: 13px;
   margin: 0;
 }
 
 .perfil-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--bg-2);
+  border-radius: var(--r-lg);
   padding: 24px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   margin-bottom: 16px;
@@ -86,7 +86,7 @@
 
 .perfil-campo label {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--fg-3);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.4px;
@@ -98,18 +98,18 @@
   border-radius: 7px;
   font-size: 15px;
   transition: border-color 0.2s;
-  background: white;
+  background: var(--bg-2);
 }
 
 .perfil-campo input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--olympo-lime);
   box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
 }
 
 .perfil-campo input:disabled {
-  background: #f8f9fa;
-  color: #6c757d;
+  background: var(--bg-0);
+  color: var(--fg-3);
   cursor: not-allowed;
 }
 
@@ -141,12 +141,12 @@
   border-radius: 7px;
   font-size: 15px;
   cursor: pointer;
-  background: white;
+  background: var(--bg-2);
   color: #495057;
   transition: background 0.2s;
 }
 
-.btn-cancelar-perfil:hover { background: #f8f9fa; }
+.btn-cancelar-perfil:hover { background: var(--bg-0); }
 
 .perfil-links {
   display: flex;
@@ -164,13 +164,13 @@
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
   font-size: 15px;
-  color: #343a40;
+  color: var(--fg-1);
   width: 100%;
   text-align: left;
 }
 
 .perfil-link-btn:last-child { border-bottom: none; }
-.perfil-link-btn:hover { color: #007bff; }
+.perfil-link-btn:hover { color: var(--olympo-lime); }
 
 .perfil-logout {
   width: 100%;
@@ -181,7 +181,7 @@
   font-weight: 600;
   cursor: pointer;
   background: #fff0f0;
-  color: #dc3545;
+  color: var(--olympo-blood);
   margin-top: 8px;
   transition: background 0.2s;
 }
@@ -191,6 +191,16 @@
 .perfil-loading {
   text-align: center;
   padding: 60px;
-  color: #6c757d;
+  color: var(--fg-3);
   font-size: 16px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .perfil-page { padding: 20px 12px; }
+  .perfil-header h1 { font-size: 18px; }
+  .perfil-card { padding: 16px; }
+  .perfil-campo input { font-size: 16px; }
+  .perfil-acciones { flex-direction: column; }
+  .btn-editar-perfil, .btn-cancelar-perfil { width: 100%; text-align: center; min-height: 44px; }
 }

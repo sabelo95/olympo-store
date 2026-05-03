@@ -1,6 +1,8 @@
 package com.compras_service.infrastructure.controllers;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -12,15 +14,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WompiController {
 
-    private static final String INTEGRITY_SECRET = "test_integrity_lOmazuoUrCcbAfxSyeSU4uQk8HWZYAQk";
+    @Value("${wompi.integrity.secret}")
+    private String integritySecret;
 
     @GetMapping("/firma")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Map<String, String>> generarFirma(
             @RequestParam String referencia,
             @RequestParam Long montoEnCentavos,
             @RequestParam String moneda) {
         try {
-            String cadena = referencia + montoEnCentavos + moneda + INTEGRITY_SECRET;
+            String cadena = referencia + montoEnCentavos + moneda + integritySecret;
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(cadena.getBytes(StandardCharsets.UTF_8));
             StringBuilder hexString = new StringBuilder();

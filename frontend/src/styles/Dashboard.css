@@ -1,14 +1,18 @@
 .dashboard {
   padding: 24px;
-  background-color: #f5f6fa;
+  background: var(--bg-0);
   min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--fg-1);
 }
 
 .dashboard h1 {
+  font-family: var(--font-headline);
   font-size: 1.6rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--fg-1);
   margin-bottom: 24px;
+  letter-spacing: 0.03em;
 }
 
 /* KPI CARDS */
@@ -20,35 +24,38 @@
 }
 
 .kpi-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-lg);
   padding: 20px 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
   display: flex;
   flex-direction: column;
   gap: 6px;
   border-left: 4px solid transparent;
+  transition: border-color var(--t-fast);
 }
 
-.kpi-card.azul   { border-left-color: #4361ee; }
-.kpi-card.verde  { border-left-color: #2ecc71; }
-.kpi-card.naranja{ border-left-color: #f39c12; }
-.kpi-card.rojo   { border-left-color: #e74c3c; }
-.kpi-card.morado { border-left-color: #9b59b6; }
+.kpi-card.azul    { border-left-color: var(--olympo-info); }
+.kpi-card.verde   { border-left-color: var(--olympo-lime); }
+.kpi-card.naranja { border-left-color: var(--olympo-gold); }
+.kpi-card.rojo    { border-left-color: var(--olympo-blood); }
+.kpi-card.morado  { border-left-color: #9b59b6; }
 
 .kpi-label {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #888;
-  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--fg-3);
+  font-weight: 700;
+  font-family: var(--font-headline);
 }
 
 .kpi-value {
   font-size: 1.9rem;
   font-weight: 800;
-  color: #1a1a2e;
+  color: var(--fg-1);
   line-height: 1;
+  font-family: var(--font-mono);
 }
 
 /* GRID DE SECCIONES */
@@ -60,33 +67,30 @@
 }
 
 @media (max-width: 900px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
+  .dashboard-grid { grid-template-columns: 1fr; }
 }
 
 .dashboard-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-lg);
   padding: 20px 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
 
 .dashboard-card h2 {
-  font-size: 1rem;
+  font-family: var(--font-headline);
+  font-size: 0.85rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--fg-2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   margin-bottom: 16px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-1);
 }
 
 /* ESTADO BADGES */
-.estado-badges {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+.estado-badges { display: flex; flex-direction: column; gap: 10px; }
 
 .estado-row {
   display: flex;
@@ -96,86 +100,77 @@
 
 .estado-nombre {
   font-size: 0.85rem;
-  color: #555;
+  color: var(--fg-2);
   font-weight: 500;
   text-transform: capitalize;
 }
 
 .estado-badge {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   padding: 3px 12px;
-  border-radius: 20px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
 }
 
-.badge-PENDIENTE    { background: #fff3cd; color: #856404; }
-.badge-PROCESANDO   { background: #cfe2ff; color: #084298; }
-.badge-ENVIADO      { background: #d1ecf1; color: #0c5460; }
-.badge-COMPLETADO   { background: #d4edda; color: #155724; }
-.badge-CANCELADO    { background: #f8d7da; color: #721c24; }
-.badge-default      { background: #e2e3e5; color: #383d41; }
+.badge-PENDIENTE   { background: rgba(245,166,35,0.15);  color: var(--olympo-gold); }
+.badge-PROCESANDO  { background: rgba(45,212,255,0.12);  color: var(--olympo-info); }
+.badge-ENVIADO     { background: rgba(45,212,255,0.12);  color: var(--olympo-info); }
+.badge-COMPLETADO  { background: rgba(0,210,106,0.12);   color: var(--olympo-success); }
+.badge-CANCELADO   { background: rgba(255,46,46,0.12);   color: var(--olympo-blood); }
+.badge-default     { background: var(--bg-3);            color: var(--fg-3); }
 
 /* TOP PRODUCTOS */
-.top-productos-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+.top-productos-list { display: flex; flex-direction: column; gap: 10px; }
 
-.top-producto-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+.top-producto-row { display: flex; align-items: center; gap: 12px; }
 
 .top-producto-rank {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #4361ee;
-  color: white;
+  background: var(--olympo-lime);
+  color: var(--fg-on-accent);
   font-size: 0.75rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-family: var(--font-mono);
 }
 
-.top-producto-info {
-  flex: 1;
-}
+.top-producto-info { flex: 1; }
 
 .top-producto-nombre {
   font-size: 0.88rem;
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--fg-1);
 }
 
 .top-producto-bar-wrap {
-  height: 5px;
-  background: #f0f0f0;
-  border-radius: 3px;
-  margin-top: 4px;
+  height: 4px;
+  background: var(--bg-3);
+  border-radius: var(--r-pill);
+  margin-top: 5px;
 }
 
 .top-producto-bar {
-  height: 5px;
-  background: #4361ee;
-  border-radius: 3px;
+  height: 4px;
+  background: var(--olympo-lime);
+  border-radius: var(--r-pill);
 }
 
 .top-producto-cantidad {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #4361ee;
+  color: var(--olympo-lime);
   flex-shrink: 0;
+  font-family: var(--font-mono);
 }
 
 /* PEDIDOS RECIENTES */
-.pedidos-table-wrap {
-  overflow-x: auto;
-}
+.pedidos-table-wrap { overflow-x: auto; }
 
 .pedidos-table {
   width: 100%;
@@ -186,23 +181,22 @@
 .pedidos-table th {
   text-align: left;
   padding: 8px 10px;
-  font-weight: 600;
-  color: #888;
-  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--fg-3);
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid #f0f0f0;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border-1);
+  font-family: var(--font-headline);
 }
 
 .pedidos-table td {
   padding: 10px 10px;
-  border-bottom: 1px solid #f9f9f9;
-  color: #333;
+  border-bottom: 1px solid var(--border-1);
+  color: var(--fg-2);
 }
 
-.pedidos-table tr:last-child td {
-  border-bottom: none;
-}
+.pedidos-table tr:last-child td { border-bottom: none; }
 
 /* VENTAS POR PERÍODO */
 .periodo-form {
@@ -214,46 +208,49 @@
 }
 
 .periodo-form label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #555;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .periodo-form input[type="date"] {
   padding: 7px 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
   font-size: 0.85rem;
   outline: none;
-  transition: border-color 0.2s;
+  background: var(--bg-3);
+  color: var(--fg-1);
+  transition: border-color var(--t-fast);
 }
 
 .periodo-form input[type="date"]:focus {
-  border-color: #4361ee;
+  border-color: var(--olympo-lime);
 }
 
 .btn-consultar {
   padding: 8px 18px;
-  background: #4361ee;
-  color: white;
+  background: var(--olympo-lime);
+  color: var(--fg-on-accent);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--r-md);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  font-family: var(--font-body);
+  transition: opacity var(--t-fast);
 }
 
-.btn-consultar:hover {
-  background: #3451d1;
-}
+.btn-consultar:hover { opacity: 0.85; }
 
 .periodo-result {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   margin-top: 8px;
   flex-wrap: wrap;
 }
@@ -261,36 +258,29 @@
 .periodo-kpi {
   flex: 1;
   min-width: 120px;
-  background: #f5f6fa;
-  border-radius: 10px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
   padding: 14px 18px;
   text-align: center;
 }
 
-.periodo-kpi .kpi-label {
-  font-size: 0.72rem;
-  margin-bottom: 6px;
-}
-
-.periodo-kpi .kpi-value {
-  font-size: 1.4rem;
-}
+.periodo-kpi .kpi-label { font-size: 0.72rem; margin-bottom: 6px; }
+.periodo-kpi .kpi-value { font-size: 1.4rem; }
 
 /* LOADING / ERROR */
 .loading-text {
-  color: #888;
+  color: var(--fg-3);
   font-size: 0.9rem;
   text-align: center;
   padding: 20px 0;
 }
 
 .error-text {
-  color: #e74c3c;
+  color: var(--olympo-blood);
   font-size: 0.85rem;
   text-align: center;
   padding: 10px 0;
 }
 
-.full-width {
-  grid-column: 1 / -1;
-}
+.full-width { grid-column: 1 / -1; }

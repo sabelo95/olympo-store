@@ -1,6 +1,6 @@
 .mispedidos-page {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--bg-0);
   padding: 32px 16px;
 }
 
@@ -20,22 +20,22 @@
   background: none;
   border: none;
   font-size: 15px;
-  color: #6c757d;
+  color: var(--fg-3);
   cursor: pointer;
 }
 
 .mispedidos-header h1 {
   margin: 0;
   font-size: 22px;
-  color: #343a40;
+  color: var(--fg-1);
 }
 
 .pedido-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--bg-2);
+  border-radius: var(--r-lg);
   padding: 20px;
   margin-bottom: 16px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  box-shadow: var(--shadow-card);
 }
 
 .pedido-card-header {
@@ -55,12 +55,12 @@
 .pedido-id {
   font-weight: 700;
   font-size: 16px;
-  color: #343a40;
+  color: var(--fg-1);
 }
 
 .pedido-fecha {
   font-size: 13px;
-  color: #6c757d;
+  color: var(--fg-3);
 }
 
 .pedido-estado {
@@ -99,18 +99,18 @@
 
 .pedido-linea-nombre {
   font-weight: 500;
-  color: #343a40;
+  color: var(--fg-1);
 }
 
 .pedido-linea-detalle {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--fg-3);
   margin-top: 2px;
 }
 
 .pedido-linea-precio {
   font-weight: 600;
-  color: #343a40;
+  color: var(--fg-1);
   white-space: nowrap;
   margin-left: 12px;
 }
@@ -126,26 +126,26 @@
 
 .pedido-direccion {
   font-size: 13px;
-  color: #6c757d;
+  color: var(--fg-3);
   max-width: 60%;
 }
 
 .pedido-total {
   font-size: 18px;
   font-weight: 700;
-  color: #343a40;
+  color: var(--fg-1);
 }
 
 .pedido-metodo {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--fg-3);
   text-align: right;
 }
 
 .sin-pedidos {
   text-align: center;
   padding: 60px 20px;
-  color: #6c757d;
+  color: var(--fg-3);
 }
 
 .sin-pedidos p { font-size: 16px; margin-bottom: 16px; }
@@ -168,5 +168,19 @@
 .mispedidos-loading {
   text-align: center;
   padding: 60px;
-  color: #6c757d;
+  color: var(--fg-3);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .mispedidos-page { padding: 20px 12px; }
+  .mispedidos-header h1 { font-size: 18px; }
+  .pedido-card { padding: 14px; }
+  .pedido-card-header { flex-direction: column; align-items: flex-start; }
+  .pedido-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .pedido-direccion { max-width: 100%; }
 }

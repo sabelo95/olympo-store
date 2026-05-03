@@ -22,10 +22,23 @@ export const isTokenValid = () => {
   return decoded.exp * 1000 > Date.now();
 };
 
-export const clearSession = () => {
+export const clearSession = async () => {
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (refreshToken) {
+    try {
+      await fetch(`${import.meta.env.VITE_API_AUTH}/auth/logout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      });
+    } catch {
+      // ignorar error de red en logout
+    }
+  }
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("clienteId");
+  localStorage.removeItem("olympo_carrito");
 };
 
 export const getRol = () => {

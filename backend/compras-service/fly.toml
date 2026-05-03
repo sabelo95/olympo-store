@@ -8,6 +8,9 @@ dockerfile = "Dockerfile"
 SERVER_PORT = "8084"
 SPRING_PROFILES_ACTIVE = "docker"
 JAVA_OPTS = "-Xmx200m -Xms64m -XX:+UseSerialGC"
+PRODUCTO_SERVICE_URL = "http://olympo-productos.internal:8083"
+SPRINGDOC_SWAGGER_UI_ENABLED = "false"
+SPRINGDOC_API_DOCS_ENABLED = "false"
 
 [[services]]
 internal_port = 8084

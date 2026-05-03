@@ -23,7 +23,7 @@ class ReporteControllerTest {
     private GenerarReportesUseCase generarReportesUseCase;
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(roles = "ADMINISTRADOR")
     void generarReporte_ValidDates_ReturnsPdf() throws Exception {
         // Given
         String fechaInicio = "2024-01-01";
@@ -31,8 +31,8 @@ class ReporteControllerTest {
         byte[] pdfContent = "PDF Content".getBytes();
         when(generarReportesUseCase.ejecutar(fechaInicio, fechaFin)).thenReturn(pdfContent);
 
-        // When & Then
-        mockMvc.perform(get("/reportes/ventas-semanal")
+        // When & Then — controller mapping is "api/reportes/ventas-semanal" (no leading slash)
+        mockMvc.perform(get("/api/reportes/ventas-semanal")
                         .param("fechaInicio", fechaInicio)
                         .param("fechaFin", fechaFin))
                 .andExpect(status().isOk())
@@ -43,7 +43,7 @@ class ReporteControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(roles = "ADMINISTRADOR")
     void generarReporte_Exception_ReturnsInternalServerError() throws Exception {
         // Given
         String fechaInicio = "2024-01-01";
@@ -52,7 +52,7 @@ class ReporteControllerTest {
                 .thenThrow(new RuntimeException("Error al generar reporte"));
 
         // When & Then
-        mockMvc.perform(get("/reportes/ventas-semanal")
+        mockMvc.perform(get("/api/reportes/ventas-semanal")
                         .param("fechaInicio", fechaInicio)
                         .param("fechaFin", fechaFin))
                 .andExpect(status().isInternalServerError());
@@ -60,4 +60,3 @@ class ReporteControllerTest {
         verify(generarReportesUseCase, times(1)).ejecutar(fechaInicio, fechaFin);
     }
 }
-

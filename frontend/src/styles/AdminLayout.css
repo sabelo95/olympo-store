@@ -1,0 +1,205 @@
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-0);
+  font-family: var(--font-body);
+}
+
+/* ── Sidebar ── */
+.admin-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--bg-1);
+  border-right: 1px solid var(--border-1);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px 20px;
+  gap: 4px;
+}
+
+.admin-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-1);
+}
+
+.admin-sidebar-title {
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--olympo-lime);
+  margin: 0;
+}
+
+.btn-sidebar-cerrar {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--fg-3);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 6px;
+  line-height: 1;
+  border-radius: var(--r-sm);
+  transition: color var(--t-fast);
+}
+.btn-sidebar-cerrar:hover { color: var(--fg-1); }
+
+.admin-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-nav-btn {
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  color: var(--fg-2);
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+}
+
+.admin-nav-btn:hover {
+  background: var(--bg-3);
+  color: var(--fg-1);
+}
+
+.admin-nav-btn.active {
+  background: var(--bg-3);
+  color: var(--olympo-lime);
+  border-left-color: var(--olympo-lime);
+  font-weight: 600;
+}
+
+.admin-logout-btn {
+  width: 100%;
+  padding: 10px 14px;
+  margin-top: 16px;
+  background: transparent;
+  color: var(--olympo-blood);
+  border: 1px solid var(--olympo-blood);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+
+.admin-logout-btn:hover {
+  background: var(--olympo-blood);
+  color: var(--fg-1);
+}
+
+/* ── Content ── */
+.admin-content {
+  flex: 1;
+  background: var(--bg-0);
+  overflow-y: auto;
+}
+
+/* ── Mobile topbar (hidden on desktop) ── */
+.admin-topbar {
+  display: none;
+}
+
+.btn-hamburger {
+  display: none;
+}
+
+.admin-overlay {
+  display: none;
+}
+
+/* ── Responsive: móvil (≤768px) ── */
+@media (max-width: 768px) {
+  .admin-shell { flex-direction: column; }
+
+  .admin-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+    height: 56px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border-1);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+
+  .btn-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid var(--border-1);
+    border-radius: var(--r-md);
+    color: var(--fg-1);
+    font-size: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color var(--t-fast), color var(--t-fast);
+  }
+  .btn-hamburger:hover { border-color: var(--olympo-lime); color: var(--olympo-lime); }
+
+  .admin-topbar-titulo {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--olympo-lime);
+  }
+
+  .btn-sidebar-cerrar { display: block; }
+
+  .admin-nav-btn {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 500;
+    width: 240px;
+  }
+
+  .admin-sidebar.abierto {
+    transform: translateX(0);
+  }
+
+  .admin-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 499;
+  }
+
+  .admin-content {
+    margin-left: 0;
+  }
+}

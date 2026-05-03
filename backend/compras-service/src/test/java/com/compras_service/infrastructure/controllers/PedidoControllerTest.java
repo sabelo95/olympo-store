@@ -1,9 +1,13 @@
 package com.compras_service.infrastructure.controllers;
 
+import com.compras_service.domain.Enums.EstadoPedido;
+import com.compras_service.domain.model.Pedido;
 import com.compras_service.domain.usecase.PedidoUseCases.ActualizarPedidoUseCase;
 import com.compras_service.domain.usecase.PedidoUseCases.CrearPedidoUseCase;
 import com.compras_service.domain.usecase.PedidoUseCases.EliminarPedidoUseCase;
+import com.compras_service.domain.usecase.PedidoUseCases.ObtenerPedidoUseCase;
 import com.compras_service.infrastructure.adapters.DTOs.ActualizarPedidoRequest;
+import com.compras_service.infrastructure.adapters.DTOs.CrearPedidoRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +21,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -36,61 +42,74 @@ class PedidoControllerTest {
     @MockBean
     private EliminarPedidoUseCase eliminarPedidoUseCase;
 
+    @MockBean
+    private ObtenerPedidoUseCase obtenerPedidoUseCase;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     private ActualizarPedidoRequest actualizarPedidoRequest;
+    private CrearPedidoRequest crearPedidoRequest;
+    private Pedido pedidoResponse;
 
     @BeforeEach
     void setUp() {
+        crearPedidoRequest = new CrearPedidoRequest();
+        crearPedidoRequest.setDireccionEnvio("Calle 123 #45-67, Bogotá");
+        crearPedidoRequest.setMetodoPago("EFECTIVO");
+
         actualizarPedidoRequest = new ActualizarPedidoRequest();
         actualizarPedidoRequest.setId(1L);
         actualizarPedidoRequest.setDireccionEnvio("Calle 123 #45-67, Bogotá");
-        actualizarPedidoRequest.setDetallePedido(new ArrayList<>());
+        actualizarPedidoRequest.setDetalles(new ArrayList<>());
+
+        pedidoResponse = new Pedido();
+        pedidoResponse.setId(1L);
     }
 
     @Test
     @WithMockUser(roles = "CLIENTE")
     void crearPedido_ValidRequest_ReturnsOk() throws Exception {
-        // Given
         Long carritoId = 1L;
         Long clienteId = 1L;
-        String direccion = "Calle 123 #45-67, Bogotá";
-        doNothing().when(crearPedidoUseCase).crearPedido(clienteId, carritoId, direccion);
+        when(crearPedidoUseCase.ejecutar(eq(clienteId), eq(carritoId), any(), any())).thenReturn(pedidoResponse);
 
-        // When & Then
-        mockMvc.perform(post("/api/pedidos/carrito/{id}/cliente/{clienteId}", carritoId, clienteId))
+        mockMvc.perform(post("/api/pedidos/carrito/{id}/cliente/{clienteId}", carritoId, clienteId)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(crearPedidoRequest)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Pedido creado con éxito"));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Pedido creado con éxito")));
 
-        verify(crearPedidoUseCase, times(1)).crearPedido(clienteId, carritoId, direccion);
+        verify(crearPedidoUseCase, times(1)).ejecutar(eq(clienteId), eq(carritoId), any(), any());
     }
 
     @Test
     @WithMockUser(roles = "CLIENTE")
     void crearPedido_InvalidRequest_ReturnsNotFound() throws Exception {
-        // Given
         Long carritoId = 999L;
         Long clienteId = 999L;
-        String d = "Calle 123 #45-67, Bogotá";
         doThrow(new IllegalArgumentException("Carrito o cliente no encontrado"))
-                .when(crearPedidoUseCase).crearPedido(clienteId, carritoId,d);
+                .when(crearPedidoUseCase).ejecutar(eq(clienteId), eq(carritoId), any(), any());
 
-        // When & Then
-        mockMvc.perform(post("/api/pedidos/carrito/{id}/cliente/{clienteId}", carritoId, clienteId))
+        mockMvc.perform(post("/api/pedidos/carrito/{id}/cliente/{clienteId}", carritoId, clienteId)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(crearPedidoRequest)))
                 .andExpect(status().isNotFound());
 
-        verify(crearPedidoUseCase, times(1)).crearPedido(clienteId, carritoId,d);
+        verify(crearPedidoUseCase, times(1)).ejecutar(eq(clienteId), eq(carritoId), any(), any());
     }
 
     @Test
     @WithMockUser(roles = "CLIENTE")
     void actualizarPedido_ValidRequest_ReturnsOk() throws Exception {
-        // Given
-        doNothing().when(actualizarPedidoUseCase).actualizarPedido(any(ActualizarPedidoRequest.class));
+        // actualizarPedido returns Pedido — use when().thenReturn(), not doNothing()
+        when(actualizarPedidoUseCase.actualizarPedido(any(ActualizarPedidoRequest.class)))
+                .thenReturn(pedidoResponse);
 
-        // When & Then
         mockMvc.perform(put("/api/pedidos/actualizar")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(actualizarPedidoRequest)))
                 .andExpect(status().isOk())
@@ -101,17 +120,16 @@ class PedidoControllerTest {
 
     @Test
     @WithMockUser(roles = "CLIENTE")
-    void actualizarPedido_NonExistingPedido_ReturnsNotFound() throws Exception {
-        // Given
-        doThrow(new IllegalArgumentException("Pedido no encontrado"))
-                .when(actualizarPedidoUseCase).actualizarPedido(any(ActualizarPedidoRequest.class));
+    void actualizarPedido_NonExistingPedido_ReturnsBadRequest() throws Exception {
+        when(actualizarPedidoUseCase.actualizarPedido(any(ActualizarPedidoRequest.class)))
+                .thenThrow(new IllegalArgumentException("Pedido no encontrado"));
 
-        // When & Then
         mockMvc.perform(put("/api/pedidos/actualizar")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(actualizarPedidoRequest)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Pedido no encontrado."));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Pedido no encontrado"));
 
         verify(actualizarPedidoUseCase, times(1)).actualizarPedido(any(ActualizarPedidoRequest.class));
     }
@@ -119,49 +137,52 @@ class PedidoControllerTest {
     @Test
     @WithMockUser(roles = "CLIENTE")
     void cambiarEstadoPedido_ValidRequest_ReturnsOk() throws Exception {
-        // Given
         Long pedidoId = 1L;
-        String estado = "CONFIRMADO";
-        doNothing().when(actualizarPedidoUseCase).actualizarEstadoPedido(eq(pedidoId), any());
+        // Use a valid EstadoPedido value: CREADO, EN_PROCESO, COMPLETADO, CANCELADO
+        String estado = "EN_PROCESO";
+        // actualizarEstadoPedido returns Pedido — use when().thenReturn()
+        when(actualizarPedidoUseCase.actualizarEstadoPedido(eq(pedidoId), eq(EstadoPedido.EN_PROCESO)))
+                .thenReturn(pedidoResponse);
 
-        // When & Then
         mockMvc.perform(put("/api/pedidos/actualizar-estado")
+                        .with(csrf())
                         .param("id", String.valueOf(pedidoId))
                         .param("estado", estado))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Estado del pedido actualizado exitosamente."));
 
-        verify(actualizarPedidoUseCase, times(1)).actualizarEstadoPedido(eq(pedidoId), any());
+        verify(actualizarPedidoUseCase, times(1))
+                .actualizarEstadoPedido(eq(pedidoId), eq(EstadoPedido.EN_PROCESO));
     }
 
     @Test
     @WithMockUser(roles = "CLIENTE")
     void cambiarEstadoPedido_NonExistingPedido_ReturnsNotFound() throws Exception {
-        // Given
         Long pedidoId = 999L;
-        String estado = "CONFIRMADO";
-        doThrow(new IllegalArgumentException("Pedido no encontrado"))
-                .when(actualizarPedidoUseCase).actualizarEstadoPedido(eq(pedidoId), any());
+        // Use a valid EstadoPedido value
+        String estado = "EN_PROCESO";
+        when(actualizarPedidoUseCase.actualizarEstadoPedido(eq(pedidoId), eq(EstadoPedido.EN_PROCESO)))
+                .thenThrow(new IllegalArgumentException("Pedido no encontrado"));
 
-        // When & Then
         mockMvc.perform(put("/api/pedidos/actualizar-estado")
+                        .with(csrf())
                         .param("id", String.valueOf(pedidoId))
                         .param("estado", estado))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Pedido no encontrado."));
+                .andExpect(content().string("Pedido no encontrado"));
 
-        verify(actualizarPedidoUseCase, times(1)).actualizarEstadoPedido(eq(pedidoId), any());
+        verify(actualizarPedidoUseCase, times(1))
+                .actualizarEstadoPedido(eq(pedidoId), eq(EstadoPedido.EN_PROCESO));
     }
 
     @Test
     @WithMockUser(roles = "CLIENTE")
     void eliminarPedido_ExistingId_ReturnsOk() throws Exception {
-        // Given
         Long pedidoId = 1L;
         doNothing().when(eliminarPedidoUseCase).eliminarPedido(pedidoId);
 
-        // When & Then
         mockMvc.perform(delete("/api/pedidos")
+                        .with(csrf())
                         .param("id", String.valueOf(pedidoId)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Pedido eliminado exitosamente."));
@@ -172,13 +193,12 @@ class PedidoControllerTest {
     @Test
     @WithMockUser(roles = "CLIENTE")
     void eliminarPedido_NonExistingId_ReturnsNotFound() throws Exception {
-        // Given
         Long pedidoId = 999L;
         doThrow(new IllegalArgumentException("Pedido no encontrado"))
                 .when(eliminarPedidoUseCase).eliminarPedido(pedidoId);
 
-        // When & Then
         mockMvc.perform(delete("/api/pedidos")
+                        .with(csrf())
                         .param("id", String.valueOf(pedidoId)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Pedido no encontrado."));
@@ -186,4 +206,3 @@ class PedidoControllerTest {
         verify(eliminarPedidoUseCase, times(1)).eliminarPedido(pedidoId);
     }
 }
-

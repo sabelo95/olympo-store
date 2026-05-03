@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +28,7 @@ public class ReporteController {
     private final GenerarReportesUseCase generarReporteSemanalUseCase;
 
     @GetMapping("/ventas-semanal")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @Operation(summary = "Generar reporte de ventas", description = "Genera un reporte PDF de ventas entre dos fechas")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Operación exitosa",

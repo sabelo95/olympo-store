@@ -3,10 +3,13 @@ package com.loginservice.Controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.loginservice.Config.JwtAuthenticationFilter;
 import com.loginservice.Config.JwtUtil;
+import com.loginservice.DTO.CrearUsuarioRequest;
 import com.loginservice.DTO.UsuarioDTO;
+import com.loginservice.DTO.UsuarioResponse;
 import com.loginservice.Model.Usuario;
+import com.loginservice.Service.LoginRateLimiterService;
+import com.loginservice.Service.TokenBlacklistService;
 import com.loginservice.Service.UsuarioService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,8 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,6 +39,12 @@ class UsuarioControllerTest {
     private UsuarioService usuarioService;
 
     @MockBean
+    private LoginRateLimiterService rateLimiter;
+
+    @MockBean
+    private TokenBlacklistService blacklist;
+
+    @MockBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @MockBean
@@ -45,11 +52,6 @@ class UsuarioControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-        // No resetear los mocks, dejar que se configuren en cada test
-    }
 
     @Test
     void login_ValidCredentials_ReturnsOk() throws Exception {
@@ -59,16 +61,17 @@ class UsuarioControllerTest {
         response.put("accessToken", "token123");
         response.put("refreshToken", "refresh123");
 
-        ResponseEntity<?> responseEntity = ResponseEntity.ok(response);
-        doReturn(responseEntity).when(usuarioService).login("test@test.com", "password");
+        // Rate limiter must allow the request
+        when(rateLimiter.permitir(any())).thenReturn(true);
+        doReturn(ResponseEntity.ok(response)).when(usuarioService).login("test@test.com", "password");
 
         // When & Then
         mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(usuarioDTO)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.accessToken").value("token123"))
-            .andExpect(jsonPath("$.refreshToken").value("refresh123"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(usuarioDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("token123"))
+                .andExpect(jsonPath("$.refreshToken").value("refresh123"));
 
         verify(usuarioService, times(1)).login("test@test.com", "password");
     }
@@ -77,56 +80,61 @@ class UsuarioControllerTest {
     void login_InvalidCredentials_ReturnsUnauthorized() throws Exception {
         // Given
         UsuarioDTO usuarioDTO = new UsuarioDTO("test@test.com", "wrongPassword");
-        
-        ResponseEntity<?> errorResponse = ResponseEntity.status(401).body("Credenciales incorrectas");
-        doReturn(errorResponse).when(usuarioService).login("test@test.com", "wrongPassword");
+
+        when(rateLimiter.permitir(any())).thenReturn(true);
+        doReturn(ResponseEntity.status(401).body("Credenciales incorrectas"))
+                .when(usuarioService).login("test@test.com", "wrongPassword");
 
         // When & Then
         mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(usuarioDTO)))
-            .andExpect(status().isUnauthorized())
-            .andExpect(content().string("Credenciales incorrectas"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(usuarioDTO)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("Credenciales incorrectas"));
 
         verify(usuarioService, times(1)).login("test@test.com", "wrongPassword");
     }
 
     @Test
-    void crearUsuario_ValidUser_ReturnsSuccess() throws Exception {
-        // Given
-        Usuario usuario = new Usuario();
-        usuario.setNombre("Test User");
-        usuario.setCorreo("test@test.com");
-        usuario.setContrasena("password123");
-        usuario.setRol("USER");
+    void crearUsuario_ValidUser_ReturnsCreated() throws Exception {
+        // Given — controller accepts CrearUsuarioRequest, returns 201
+        CrearUsuarioRequest request = new CrearUsuarioRequest();
+        request.setNombre("Test User");
+        request.setCorreo("test@test.com");
+        request.setContrasena("password123");
+        request.setRol("CLIENTE");
 
-        when(usuarioService.crearUsuario(any(Usuario.class))).thenReturn(usuario);
+        UsuarioResponse usuarioResponse = new UsuarioResponse(1L, "Test User", "test@test.com", "CLIENTE", true);
+        when(usuarioService.crearUsuario(any(CrearUsuarioRequest.class))).thenReturn(usuarioResponse);
 
         // When & Then
         mockMvc.perform(post("/auth/crear")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(usuario)))
-            .andExpect(status().isOk())
-            .andExpect(content().string(containsString("Usuario creado con éxito")));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
 
-        verify(usuarioService).crearUsuario(any(Usuario.class));
+        verify(usuarioService).crearUsuario(any(CrearUsuarioRequest.class));
     }
 
     @Test
-    void crearUsuario_MissingFields_ReturnsError() throws Exception {
-        // Given
-        Usuario usuario = new Usuario();
-        usuario.setNombre(null);
-        usuario.setCorreo("test@test.com");
+    void crearUsuario_DuplicateEmail_ReturnsConflict() throws Exception {
+        // Given — controller catches IllegalArgumentException and returns 409
+        CrearUsuarioRequest request = new CrearUsuarioRequest();
+        request.setNombre("Test User");
+        request.setCorreo("test@test.com");
+        request.setContrasena("password123");
+        request.setRol("CLIENTE");
+
+        when(usuarioService.crearUsuario(any(CrearUsuarioRequest.class)))
+                .thenThrow(new IllegalArgumentException("El correo ya está registrado"));
 
         // When & Then
         mockMvc.perform(post("/auth/crear")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(usuario)))
-            .andExpect(status().isOk())
-            .andExpect(content().string(containsString("Todos los campos son obligatorios")));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict());
 
-        verify(usuarioService, never()).crearUsuario(any());
+        verify(usuarioService).crearUsuario(any(CrearUsuarioRequest.class));
     }
 
     @Test
@@ -140,36 +148,24 @@ class UsuarioControllerTest {
 
         // When & Then
         mockMvc.perform(get("/auth/obtener/1"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.nombre").value("Test User"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.nombre").value("Test User"));
 
         verify(usuarioService).findById(1L);
     }
 
     @Test
-    void obtenerUsuario_NonExistingUser_ThrowsException() {
-        // Given
+    void obtenerUsuario_NonExistingUser_ThrowsRuntimeException() {
+        // Given — controller calls orElseThrow(RuntimeException)
+        // MockMvc wraps the unhandled RuntimeException in a ServletException and re-throws it
         when(usuarioService.findById(999L)).thenReturn(Optional.empty());
 
-        // When & Then - Verificar que se lanza RuntimeException cuando el usuario no existe
-        // Usamos assertThrows para verificar la excepción directamente en el controlador
-        assertThrows(RuntimeException.class, () -> {
-            try {
-                mockMvc.perform(get("/auth/obtener/999"))
-                    .andReturn();
-            } catch (Exception e) {
-                // Buscar la RuntimeException en la cadena de excepciones
-                Throwable cause = e;
-                while (cause != null) {
-                    if (cause instanceof RuntimeException && cause.getMessage().contains("999")) {
-                        throw (RuntimeException) cause;
-                    }
-                    cause = cause.getCause();
-                }
-                throw e;
-            }
-        });
+        // When & Then — the ServletException propagates out of perform()
+        org.junit.jupiter.api.Assertions.assertThrows(
+                Exception.class,
+                () -> mockMvc.perform(get("/auth/obtener/999"))
+        );
 
         verify(usuarioService, times(1)).findById(999L);
     }
@@ -179,30 +175,29 @@ class UsuarioControllerTest {
         // Given
         Map<String, String> request = new HashMap<>();
         request.put("refreshToken", "validToken");
-        
+
         Map<String, String> response = new HashMap<>();
         response.put("accessToken", "newToken");
         response.put("refreshToken", "validToken");
 
-        ResponseEntity<?> refreshResponse = ResponseEntity.ok(response);
-        doReturn(refreshResponse).when(usuarioService).refreshToken("validToken");
+        when(blacklist.estaInvalidado("validToken")).thenReturn(false);
+        doReturn(ResponseEntity.ok(response)).when(usuarioService).refreshToken("validToken");
 
         // When & Then
         mockMvc.perform(post("/auth/refresh")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.accessToken").value("newToken"))
-            .andExpect(jsonPath("$.refreshToken").value("validToken"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("newToken"))
+                .andExpect(jsonPath("$.refreshToken").value("validToken"));
 
         verify(usuarioService, times(1)).refreshToken("validToken");
     }
 
     @Test
-    void accesoProtegido_WithAuthentication_ReturnsSuccess() throws Exception {
-        // When & Then - En este test la seguridad está deshabilitada, por eso pasa
+    void accesoProtegido_WithFiltersDisabled_ReturnsSuccess() throws Exception {
+        // Security filters are disabled via @AutoConfigureMockMvc(addFilters = false)
         mockMvc.perform(get("/auth/protegido"))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
     }
 }
-

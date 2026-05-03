@@ -42,6 +42,7 @@ const agruparPorNombre = (productos) => {
     grupo.cantidadTotal += p.cantidad;
     grupo.precioMin = Math.min(grupo.precioMin, p.precio);
     grupo.precioMax = Math.max(grupo.precioMax, p.precio);
+    if (!grupo.imagenGeneral && p.imagenGeneral) grupo.imagenGeneral = p.imagenGeneral;
   });
   return Array.from(mapa.values());
 };
@@ -223,7 +224,7 @@ function ProductosCliente() {
         varianteId, productoId: variante.productoId,
         nombre: grupo.nombre, sabor: variante.sabor,
         tamano: variante.tamano, precio: variante.precio,
-        imagenGeneral: variante.imagenGeneral, cantidad,
+        imagenGeneral: variante.imagenGeneral || grupo.imagenGeneral, cantidad,
       };
     })
     .filter(Boolean);
@@ -279,13 +280,17 @@ function ProductosCliente() {
     window.location.reload();
   };
 
+  const scrollACatalogo = () => {
+    document.getElementById("catalogo-section")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <div className="catalogo">
+    <div style={{ background: "var(--bg-0)", minHeight: "100vh" }}>
       {/* Navbar */}
       <nav className="tienda-navbar">
         <div className="tienda-navbar-brand">
           <img src={logo} alt="Olympo Store" className="tienda-navbar-logo" />
-          <span className="tienda-navbar-nombre">Olympo Store</span>
+          <span className="tienda-navbar-nombre">OLYMPO<small>· STORE ·</small></span>
         </div>
         <div className="tienda-navbar-acciones">
           {esAdmin ? (
@@ -308,12 +313,42 @@ function ProductosCliente() {
         </div>
       </nav>
 
-      <h1>Catálogo de Productos</h1>
+      {/* Hero */}
+      <section className="hero-tienda">
+        <div className="hero-tienda-inner">
+          <p className="hero-eyebrow">Suplementos · Performance · Colombia</p>
+          <h1 className="hero-tienda-titulo">
+            ENTRENA.<br/>RECUPERA.<br/><span className="accent">DOMINA.</span>
+          </h1>
+          <p className="hero-tienda-sub">
+            Los mejores suplementos deportivos a los mejores precios en un solo lugar.
+          </p>
+          <button className="btn-navbar-registro" style={{ padding: "13px 28px", fontSize: "14px" }} onClick={scrollACatalogo}>
+            VER CATÁLOGO →
+          </button>
+        </div>
+      </section>
+
+      {/* Marquee */}
+      <div className="marquee-strip">
+        <div className="marquee-track">
+          {["ENVÍO GRATIS DESDE $150K", "ENTREGAS A TODA COLOMBIA", "100% ORIGINALES", "WOMPI · TARJETA · PSE", "NUEVOS DROPS CADA SEMANA",
+            "ENVÍO GRATIS DESDE $150K", "ENTREGAS A TODA COLOMBIA", "100% ORIGINALES", "WOMPI · TARJETA · PSE", "NUEVOS DROPS CADA SEMANA"]
+            .map((t, i) => <span key={i}>{t}</span>)}
+        </div>
+      </div>
+
+      <div className="catalogo" id="catalogo-section">
 
       {/* Destacados */}
       {grupos.length > 0 && (
         <div className="destacados-seccion">
-          <h2 className="destacados-titulo">⭐ Más populares</h2>
+          <div className="seccion-heading" style={{ paddingTop: 0, marginBottom: 16 }}>
+            <div className="seccion-heading-wrap">
+              <span className="seccion-eyebrow">Top ventas</span>
+              <h2 className="seccion-titulo">MÁS VENDIDOS</h2>
+            </div>
+          </div>
           <div className="destacados-grid">
             {[...grupos]
               .sort((a, b) => b.cantidadTotal - a.cantidadTotal)
@@ -342,6 +377,14 @@ function ProductosCliente() {
           </div>
         </div>
       )}
+
+      {/* Section heading */}
+      <div className="seccion-heading">
+        <div className="seccion-heading-wrap">
+          <span className="seccion-eyebrow">Catálogo</span>
+          <h2 className="seccion-titulo">TODOS LOS PRODUCTOS</h2>
+        </div>
+      </div>
 
       {/* Filtros */}
       <div className="filtros">
@@ -420,10 +463,10 @@ function ProductosCliente() {
                 </div>
                 {(sabores.length > 0 || tamanos.length > 0) && (
                   <div className="tarjeta-badges">
-                    {sabores.slice(0, 3).map((s) => <Badge key={s} text={s} bg="#fff3cd" color="#856404" />)}
-                    {sabores.length > 3 && <Badge text={`+${sabores.length - 3} más`} bg="#fff3cd" color="#856404" />}
-                    {tamanos.slice(0, 3).map((t) => <Badge key={t} text={t} bg="#d1ecf1" color="#0c5460" />)}
-                    {tamanos.length > 3 && <Badge text={`+${tamanos.length - 3} más`} bg="#d1ecf1" color="#0c5460" />}
+                    {sabores.slice(0, 3).map((s) => <Badge key={s} text={s} bg="rgba(245,166,35,0.15)" color="var(--olympo-gold)" />)}
+                    {sabores.length > 3 && <Badge text={`+${sabores.length - 3} más`} bg="rgba(245,166,35,0.15)" color="var(--olympo-gold)" />}
+                    {tamanos.slice(0, 3).map((t) => <Badge key={t} text={t} bg="rgba(45,212,255,0.12)" color="var(--olympo-info)" />)}
+                    {tamanos.length > 3 && <Badge text={`+${tamanos.length - 3} más`} bg="rgba(45,212,255,0.12)" color="var(--olympo-info)" />}
                   </div>
                 )}
                 <div className="tarjeta-precio">{labelPrecio(grupo)}</div>
@@ -481,29 +524,33 @@ function ProductosCliente() {
       )}
 
       {/* Modal detalle */}
-      {grupoDetalle && (
+      {grupoDetalle && (() => {
+        const imagenModalGeneral = varianteActiva?.imagenGeneral || grupoDetalle?.imagenGeneral;
+        const imagenModalNutricional = varianteActiva?.imagenNutricional
+          || grupoDetalle?.variantes?.find(v => v.imagenNutricional)?.imagenNutricional;
+        return (
         <div className="modal-overlay" onClick={cerrarDetalle}>
           <div className="modal-contenido" onClick={(e) => e.stopPropagation()}>
             <button className="modal-cerrar" onClick={cerrarDetalle}>×</button>
             <div className="modal-grid">
               <div>
                 <div className="modal-imagen-principal"
-                  style={{ cursor: varianteActiva?.imagenGeneral ? "zoom-in" : "default" }}
-                  onClick={() => varianteActiva?.imagenGeneral &&
-                    setImagenZoom(`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/generales/${varianteActiva.imagenGeneral}`)}>
-                  {varianteActiva?.imagenGeneral
-                    ? <><img src={`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/generales/${varianteActiva.imagenGeneral}`}
+                  style={{ cursor: imagenModalGeneral ? "zoom-in" : "default" }}
+                  onClick={() => imagenModalGeneral &&
+                    setImagenZoom(`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/generales/${imagenModalGeneral}`)}>
+                  {imagenModalGeneral
+                    ? <><img src={`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/generales/${imagenModalGeneral}`}
                           alt={grupoDetalle.nombre} onError={(e) => { e.target.style.display = "none"; }} />
                         <div className="zoom-hint">🔍 Click para ampliar</div></>
                     : <span className="modal-placeholder">📦</span>
                   }
                 </div>
-                {varianteActiva?.imagenNutricional && (
+                {imagenModalNutricional && (
                   <div>
                     <h4 className="modal-nutricional-label">Información Nutricional</h4>
                     <div className="modal-nutricional"
-                      onClick={() => setImagenZoom(`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/nutricionales/${varianteActiva.imagenNutricional}`)}>
-                      <img src={`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/nutricionales/${varianteActiva.imagenNutricional}`}
+                      onClick={() => setImagenZoom(`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/nutricionales/${imagenModalNutricional}`)}>
+                      <img src={`${import.meta.env.VITE_API_ARCHIVOS}/uploads/productos/nutricionales/${imagenModalNutricional}`}
                         alt="Info nutricional" onError={(e) => { e.target.style.display = "none"; }} />
                       <div className="zoom-hint">🔍 Click para ampliar</div>
                     </div>
@@ -595,7 +642,8 @@ function ProductosCliente() {
             </div>
           </div>
         </div>
-      )}
+      );
+      })()}
 
       {/* Zoom */}
       {imagenZoom && (
@@ -634,6 +682,7 @@ function ProductosCliente() {
           }}
         />
       )}
+      </div>{/* close catalogo */}
     </div>
   );
 }

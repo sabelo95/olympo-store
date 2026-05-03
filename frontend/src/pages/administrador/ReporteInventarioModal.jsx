@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { generarReporteInventarioBajo } from "../../services/reporteService";
+import {
+  generarReporteInventarioBajo,
+  enviarReportePorCorreo,
+  descargarBlob,
+} from "../../services/reporteService";
+import { getDecodedToken } from "../../services/tokenService";
 import "../../styles/ReporteInventarioModal.css";
 
 export default function ReporteInventarioModal({ onClose }) {
@@ -7,36 +12,44 @@ export default function ReporteInventarioModal({ onClose }) {
   const [cargando, setCargando] = useState(false);
   const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
 
-  const handleGenerar = async () => {
+  const correoAdmin = getDecodedToken()?.sub ?? "";
+  const nombreArchivo = `reporte_inventario_bajo_${limite}.pdf`;
+
+  const handleDescargar = async () => {
     if (limite < 1) {
       setMensaje({ texto: "El límite debe ser mayor a 0", tipo: "error" });
       return;
     }
-
     setCargando(true);
     setMensaje({ texto: "", tipo: "" });
-
     try {
-      const pdfBlob = await generarReporteInventarioBajo(limite);
+      const blob = await generarReporteInventarioBajo(limite);
+      descargarBlob(blob, nombreArchivo);
+      setMensaje({ texto: "PDF descargado correctamente.", tipo: "success" });
+    } catch (error) {
+      setMensaje({ texto: error.message, tipo: "error" });
+    } finally {
+      setCargando(false);
+    }
+  };
 
-      // Crear URL temporal para descargar el PDF
-      const url = window.URL.createObjectURL(pdfBlob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `reporte_inventario_bajo_${limite}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      setMensaje({
-        texto: "Reporte generado y enviado a tu correo ✅",
-        tipo: "success",
-      });
-
-      setTimeout(() => {
-        onClose();
-      }, 2000);
+  const handleEnviar = async () => {
+    if (limite < 1) {
+      setMensaje({ texto: "El límite debe ser mayor a 0", tipo: "error" });
+      return;
+    }
+    setCargando(true);
+    setMensaje({ texto: "", tipo: "" });
+    try {
+      const blob = await generarReporteInventarioBajo(limite);
+      await enviarReportePorCorreo(
+        blob,
+        nombreArchivo,
+        correoAdmin,
+        `Reporte de inventario bajo: productos con stock ≤ ${limite} unidades.`
+      );
+      setMensaje({ texto: `Reporte enviado a ${correoAdmin} ✅`, tipo: "success" });
+      setTimeout(onClose, 2000);
     } catch (error) {
       setMensaje({ texto: error.message, tipo: "error" });
     } finally {
@@ -48,16 +61,13 @@ export default function ReporteInventarioModal({ onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>📊 Generar Reporte de Inventario Bajo</h3>
-          <button className="modal-close" onClick={onClose}>
-            ✕
-          </button>
+          <h3>Reporte de Inventario Bajo</h3>
+          <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
         <div className="modal-body">
           <p className="modal-description">
-            Este reporte mostrará todos los productos con stock menor o igual al
-            límite especificado.
+            Productos con stock menor o igual al límite especificado.
           </p>
 
           <div className="form-group">
@@ -74,27 +84,27 @@ export default function ReporteInventarioModal({ onClose }) {
             <small>Productos con stock ≤ {limite} unidades</small>
           </div>
 
+          {correoAdmin && (
+            <p style={{ fontSize: "0.82rem", color: "#888", margin: "8px 0 0" }}>
+              Correo destino: <strong>{correoAdmin}</strong>
+            </p>
+          )}
+
           {mensaje.texto && (
-            <div className={`mensaje-modal ${mensaje.tipo}`}>
-              {mensaje.texto}
-            </div>
+            <div className={`mensaje-modal ${mensaje.tipo}`}>{mensaje.texto}</div>
           )}
         </div>
 
         <div className="modal-footer">
-          <button
-            className="btn-cancelar"
-            onClick={onClose}
-            disabled={cargando}
-          >
+          <button className="btn-cancelar" onClick={onClose} disabled={cargando}>
             Cancelar
           </button>
-          <button
-            className="btn-generar"
-            onClick={handleGenerar}
-            disabled={cargando}
-          >
-            {cargando ? "Generando..." : "📥 Generar Reporte"}
+          <button className="btn-generar" onClick={handleDescargar} disabled={cargando}>
+            {cargando ? "Generando..." : "Descargar PDF"}
+          </button>
+          <button className="btn-generar" onClick={handleEnviar} disabled={cargando || !correoAdmin}
+            style={{ background: "#2b6cb0" }}>
+            {cargando ? "Enviando..." : "Enviar al correo"}
           </button>
         </div>
       </div>

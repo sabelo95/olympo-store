@@ -77,44 +77,88 @@ public class ProductoService {
         return productoRepository.findByNombre(nombre).orElse(null);
     }
 
+    public Producto obtenerProductoPorId(Long id) {
+        return productoRepository.findById(id).orElse(null);
+    }
+
+    @Transactional
+    public Producto actualizarProductoPorId(Long id, RequestProductoDto productoDto) {
+        Producto p = productoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con id: " + id));
+
+        if (!p.getNombre().equals(productoDto.getNombre())) {
+            boolean existe = obtenerTodosLosProductos().stream()
+                    .filter(x -> !x.getId().equals(id))
+                    .anyMatch(x -> x.getNombre().equals(productoDto.getNombre()));
+            if (existe) throw new IllegalArgumentException("Ya existe un producto con nombre: " + productoDto.getNombre());
+        }
+
+        if (productoDto.getNombre() != null)      p.setNombre(productoDto.getNombre());
+        if (productoDto.getDescripcion() != null)  p.setDescripcion(productoDto.getDescripcion());
+        if (productoDto.getTamano() != null)       p.setTamano(productoDto.getTamano());
+        if (productoDto.getSabor() != null)        p.setSabor(productoDto.getSabor());
+        if (productoDto.getPrecio() != null)       p.setPrecio(productoDto.getPrecio());
+        if (productoDto.getCosto() != null)        p.setCosto(productoDto.getCosto());
+        if (productoDto.getCategoria() != null) {
+            if (!categoriaService.validarCategoria(productoDto.getCategoria()))
+                throw new IllegalArgumentException("Categoría inválida: " + productoDto.getCategoria().getId());
+            p.setCategoria(productoDto.getCategoria());
+        }
+        if (productoDto.getMarca() != null) {
+            if (!marcaService.validarMarca(productoDto.getMarca().getNombre()))
+                throw new IllegalArgumentException("Marca inválida: " + productoDto.getMarca().getNombre());
+            p.setMarca(productoDto.getMarca());
+        }
+        if (productoDto.getCantidad() != null) {
+            p.setCantidad(productoDto.getCantidad());
+            historialService.agregarHistorial(p, productoDto.getCantidad());
+        }
+        p.setImagenGeneral(productoDto.getImagenGeneral());
+        p.setImagenNutricional(productoDto.getImagenNutricional());
+
+        return productoRepository.save(p);
+    }
+
     @Transactional
     public ProductoResponseDto crearProducto(RequestProductoDto productoDto) {
 
-        Producto producto = new Producto();
-
-        if(obtenerProductoPorNombre(productoDto.getNombre()) != null){
-            throw new IllegalArgumentException("El producto con nombre " + productoDto.getNombre() + " ya existe.");
+        // Uniqueness check by nombre+sabor+tamano (not by nombre alone — multiple variants allowed)
+        boolean duplicado = obtenerTodosLosProductos().stream().anyMatch(p ->
+            p.getNombre().equals(productoDto.getNombre())
+            && java.util.Objects.equals(p.getSabor(), productoDto.getSabor())
+            && java.util.Objects.equals(p.getTamano(), productoDto.getTamano()));
+        if (duplicado) {
+            throw new IllegalArgumentException(
+                "Ya existe un producto con nombre \"" + productoDto.getNombre()
+                + "\", sabor \"" + productoDto.getSabor()
+                + "\" y tamaño \"" + productoDto.getTamano() + "\".");
         }
-
-        producto.setNombre(productoDto.getNombre());
-        producto.setDescripcion(productoDto.getDescripcion());
 
         if(productoDto.getCantidad() == null || productoDto.getCantidad() < 0){
             throw new IllegalArgumentException("La cantidad no puede ser nula o negativa.");
         }
-        producto.setCantidad(productoDto.getCantidad());
 
-        if (categoriaService.validarCategoria(productoDto.getCategoria())) {
-            producto.setCategoria(productoDto.getCategoria());
-        } else {
+        if (!categoriaService.validarCategoria(productoDto.getCategoria()))
             throw new IllegalArgumentException("La categoría con ID " + productoDto.getCategoria().getId() + " no existe.");
-        }
 
-        if (marcaService.validarMarca(productoDto.getMarca().getNombre())) {
-            producto.setMarca(productoDto.getMarca());
-        } else {
+        if (!marcaService.validarMarca(productoDto.getMarca().getNombre()))
             throw new IllegalArgumentException("La marca con ID " + productoDto.getMarca().getId() + " no existe.");
-        }
 
+        Producto producto = new Producto();
+        producto.setNombre(productoDto.getNombre());
+        producto.setDescripcion(productoDto.getDescripcion());
+        producto.setCantidad(productoDto.getCantidad());
+        producto.setCategoria(productoDto.getCategoria());
+        producto.setMarca(productoDto.getMarca());
         producto.setPrecio(productoDto.getPrecio());
         producto.setCosto(productoDto.getCosto());
-
-
+        producto.setTamano(productoDto.getTamano());
+        producto.setSabor(productoDto.getSabor());
         producto.setImagenGeneral(productoDto.getImagenGeneral());
         producto.setImagenNutricional(productoDto.getImagenNutricional());
 
         Producto productoGuardado = productoRepository.save(producto);
-        historialService.agregarHistorial(producto, productoDto.getCantidad());
+        historialService.agregarHistorial(productoGuardado, productoDto.getCantidad());
 
         return productoMapper.toDto(productoGuardado);
     }
@@ -125,6 +169,12 @@ public class ProductoService {
     public void eliminarProducto(String nombre) {
         Producto producto = productoRepository.findByNombre(nombre)
                 .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con nombre: " + nombre));
+        productoRepository.delete(producto);
+    }
+
+    public void eliminarProductoPorId(Long id) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con id: " + id));
         productoRepository.delete(producto);
     }
 
@@ -165,6 +215,12 @@ public class ProductoService {
         }
         if (productoDto.getPrecio() != null) {
             productoExistente.setPrecio(productoDto.getPrecio());
+        }
+        if (productoDto.getImagenGeneral() != null) {
+            productoExistente.setImagenGeneral(productoDto.getImagenGeneral());
+        }
+        if (productoDto.getImagenNutricional() != null) {
+            productoExistente.setImagenNutricional(productoDto.getImagenNutricional());
         }
         if (productoDto.getCantidad() != null) {
             int nuevaCantidad = productoDto.getCantidad();

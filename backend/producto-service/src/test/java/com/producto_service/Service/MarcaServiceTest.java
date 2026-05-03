@@ -67,8 +67,8 @@ class MarcaServiceTest {
         when(marcaRepository.findByNombre("No existe")).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> 
-            marcaService.obtenerMarcaPorNombre("No existe"));
+        assertThrows(IllegalArgumentException.class, () ->
+                marcaService.obtenerMarcaPorNombre("No existe"));
     }
 
     @Test
@@ -101,7 +101,7 @@ class MarcaServiceTest {
         // Given
         Marca marcaActualizada = new Marca();
         marcaActualizada.setNombre("Samsung Updated");
-        
+
         when(marcaRepository.findByNombre("Samsung")).thenReturn(Optional.of(marca));
         when(marcaRepository.save(any(Marca.class))).thenReturn(marca);
 
@@ -137,5 +137,3 @@ class MarcaServiceTest {
         assertFalse(result);
     }
 }
-
-

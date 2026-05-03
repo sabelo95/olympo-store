@@ -32,9 +32,9 @@ export async function login(data) {
     }
     const cliente = await resCliente.json();
 
-    // Si el clienteId cambia (otro usuario), limpiar el carrito local del anterior
+    // Si había OTRO usuario logueado antes, limpiar su carrito
     const clienteIdAnterior = localStorage.getItem("clienteId");
-    if (clienteIdAnterior && String(clienteIdAnterior) !== String(cliente.id)) {
+    if (clienteIdAnterior !== null && String(clienteIdAnterior) !== String(cliente.id)) {
       localStorage.removeItem("olympo_carrito");
     }
 

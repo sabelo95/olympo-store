@@ -2,6 +2,7 @@ package com.producto_service.Exception;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -46,6 +47,23 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDataIntegrity(DataIntegrityViolationException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("No se puede eliminar el producto porque tiene registros asociados.");
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGeneric(Exception e) {
+        String cause = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+        if (cause != null && (cause.contains("violates foreign key") || cause.contains("constraint"))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("No se puede eliminar el producto porque tiene registros asociados.");
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error: " + e.getClass().getSimpleName() + " - " + e.getMessage());
     }
 
     @Builder

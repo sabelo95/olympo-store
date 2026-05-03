@@ -4,6 +4,12 @@ import {
   obtenerPedidoPorId,
   actualizarEstadoPedido,
 } from "../../services/pedidoService";
+import {
+  generarReporteVentas,
+  enviarReportePorCorreo,
+  descargarBlob,
+} from "../../services/reporteService";
+import { getDecodedToken } from "../../services/tokenService";
 import "../../styles/Ventas.css";
 
 const ESTADOS = ["CREADO", "EN_PROCESO", "COMPLETADO", "CANCELADO"];
@@ -159,6 +165,95 @@ function FilaPedido({ pedido, onVerDetalle, onEstadoCambiado }) {
   );
 }
 
+// ── Modal reporte de ventas ───────────────────────────────────────────────────
+function ModalReporteVentas({ onClose }) {
+  const hoy = new Date().toISOString().split("T")[0];
+  const hace7 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+
+  const [fechaInicio, setFechaInicio] = useState(hace7);
+  const [fechaFin,    setFechaFin]    = useState(hoy);
+  const [cargando,    setCargando]    = useState(false);
+  const [msg,         setMsg]         = useState(null);
+
+  const correoAdmin = getDecodedToken()?.sub ?? "";
+
+  const nombreArchivo = () =>
+    `reporte_ventas_${fechaInicio}_${fechaFin}.pdf`;
+
+  const handleDescargar = async () => {
+    setCargando(true);
+    setMsg(null);
+    try {
+      const blob = await generarReporteVentas(fechaInicio, fechaFin);
+      descargarBlob(blob, nombreArchivo());
+      setMsg({ texto: "PDF descargado correctamente.", tipo: "ok" });
+    } catch (e) {
+      setMsg({ texto: e.message, tipo: "error" });
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const handleEnviar = async () => {
+    setCargando(true);
+    setMsg(null);
+    try {
+      const blob = await generarReporteVentas(fechaInicio, fechaFin);
+      await enviarReportePorCorreo(
+        blob,
+        nombreArchivo(),
+        correoAdmin,
+        `Reporte de ventas del período ${fechaInicio} al ${fechaFin}.`
+      );
+      setMsg({ texto: `Reporte enviado a ${correoAdmin}`, tipo: "ok" });
+    } catch (e) {
+      setMsg({ texto: e.message, tipo: "error" });
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-detalle" onClick={(e) => e.stopPropagation()}>
+        <h2>
+          Reporte de Ventas
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </h2>
+
+        <div className="reporte-form">
+          <div className="reporte-row">
+            <label>Fecha inicio</label>
+            <input type="date" value={fechaInicio} max={fechaFin}
+              onChange={(e) => setFechaInicio(e.target.value)} disabled={cargando} />
+          </div>
+          <div className="reporte-row">
+            <label>Fecha fin</label>
+            <input type="date" value={fechaFin} min={fechaInicio} max={hoy}
+              onChange={(e) => setFechaFin(e.target.value)} disabled={cargando} />
+          </div>
+          {correoAdmin && (
+            <p className="reporte-correo">Correo destino: <strong>{correoAdmin}</strong></p>
+          )}
+        </div>
+
+        {msg && (
+          <div className={`reporte-msg ${msg.tipo}`}>{msg.texto}</div>
+        )}
+
+        <div className="modal-reporte-acciones">
+          <button className="btn-ver-detalle" onClick={handleDescargar} disabled={cargando}>
+            {cargando ? "Generando..." : "Descargar PDF"}
+          </button>
+          <button className="btn-guardar-estado" onClick={handleEnviar} disabled={cargando || !correoAdmin}>
+            {cargando ? "Enviando..." : "Enviar al correo"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Página principal ──────────────────────────────────────────────────────────
 function Ventas() {
   const [pedidos, setPedidos] = useState([]);
@@ -168,6 +263,7 @@ function Ventas() {
   const [filtroEstado, setFiltroEstado] = useState("TODOS");
   const [modalId, setModalId] = useState(null);
   const [toast, setToast] = useState(null);
+  const [modalReporte, setModalReporte] = useState(false);
 
   useEffect(() => {
     obtenerTodosPedidos()
@@ -203,7 +299,12 @@ function Ventas() {
 
   return (
     <div className="ventas">
-      <h1>Gestión de Ventas</h1>
+      <div className="ventas-header">
+        <h1>Gestión de Ventas</h1>
+        <button className="btn-reporte" onClick={() => setModalReporte(true)}>
+          Generar Reporte
+        </button>
+      </div>
 
       {/* Filtros */}
       <div className="ventas-filtros">
@@ -268,6 +369,11 @@ function Ventas() {
       {/* Modal detalle */}
       {modalId && (
         <ModalDetalle pedidoId={modalId} onClose={() => setModalId(null)} />
+      )}
+
+      {/* Modal reporte */}
+      {modalReporte && (
+        <ModalReporteVentas onClose={() => setModalReporte(false)} />
       )}
 
       {/* Toast */}

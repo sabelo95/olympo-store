@@ -3,8 +3,11 @@ import {
   obtenerUsuarios,
   toggleActivoUsuario,
   eliminarUsuario,
+  crearUsuario,
 } from "../../services/usuarioService";
 import "../../styles/UsuariosAdmin.css";
+
+const FORM_VACIO = { nombre: "", correo: "", contrasena: "", rol: "CLIENTE" };
 
 export default function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
@@ -14,6 +17,9 @@ export default function Usuarios() {
   const [filtroRol, setFiltroRol] = useState("");
   const [filtroActivo, setFiltroActivo] = useState("");
   const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [form, setForm] = useState(FORM_VACIO);
+  const [guardando, setGuardando] = useState(false);
 
   useEffect(() => { cargar(); }, []);
   useEffect(() => { filtrar(); }, [usuarios, busqueda, filtroRol, filtroActivo]);
@@ -29,7 +35,7 @@ export default function Usuarios() {
       const data = await obtenerUsuarios();
       setUsuarios(data);
     } catch {
-      mostrarMensaje("Error al cargar usuarios. Verifica que el endpoint /auth/usuarios exista en el backend.", "error");
+      mostrarMensaje("Error al cargar usuarios.", "error");
     } finally {
       setCargando(false);
     }
@@ -54,7 +60,6 @@ export default function Usuarios() {
   const handleToggleActivo = async (usuario) => {
     const accion = usuario.activo ? "desactivar" : "activar";
     if (!window.confirm(`¿${accion.charAt(0).toUpperCase() + accion.slice(1)} a "${usuario.nombre}"?`)) return;
-
     try {
       const actualizado = await toggleActivoUsuario(usuario);
       setUsuarios((prev) =>
@@ -77,10 +82,37 @@ export default function Usuarios() {
     }
   };
 
+  const handleCrear = async (e) => {
+    e.preventDefault();
+    if (!form.nombre.trim() || !form.correo.trim() || !form.contrasena.trim()) {
+      mostrarMensaje("Completa todos los campos", "error");
+      return;
+    }
+    setGuardando(true);
+    try {
+      const nuevo = await crearUsuario(form);
+      setUsuarios((prev) => [...prev, nuevo]);
+      mostrarMensaje(`Usuario "${nuevo.nombre}" creado exitosamente`, "success");
+      setModalAbierto(false);
+      setForm(FORM_VACIO);
+    } catch (err) {
+      mostrarMensaje(err.message, "error");
+    } finally {
+      setGuardando(false);
+    }
+  };
+
   return (
     <div className="usuarios-admin-container">
-      <h2>Gestión de Usuarios</h2>
-      <p className="usuarios-subtitulo">Administra las cuentas de acceso al sistema.</p>
+      <div className="usuarios-header">
+        <div>
+          <h2>Gestión de Usuarios</h2>
+          <p className="usuarios-subtitulo">Administra las cuentas de acceso al sistema.</p>
+        </div>
+        <button className="btn-crear-usuario" onClick={() => { setForm(FORM_VACIO); setModalAbierto(true); }}>
+          + Crear Usuario
+        </button>
+      </div>
 
       {mensaje.texto && <div className={`mensaje ${mensaje.tipo}`}>{mensaje.texto}</div>}
 
@@ -159,6 +191,65 @@ export default function Usuarios() {
             </table>
           </div>
         </>
+      )}
+
+      {modalAbierto && (
+        <div className="modal-overlay" onClick={() => setModalAbierto(false)}>
+          <div className="modal-crear-usuario" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-crear-header">
+              <h3>Crear Usuario</h3>
+              <button className="modal-cerrar" onClick={() => setModalAbierto(false)}>✕</button>
+            </div>
+            <form className="modal-crear-form" onSubmit={handleCrear}>
+              <label>
+                Nombre
+                <input
+                  type="text"
+                  placeholder="Nombre completo"
+                  value={form.nombre}
+                  onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                  autoFocus
+                />
+              </label>
+              <label>
+                Correo
+                <input
+                  type="email"
+                  placeholder="correo@ejemplo.com"
+                  value={form.correo}
+                  onChange={(e) => setForm({ ...form, correo: e.target.value })}
+                />
+              </label>
+              <label>
+                Contraseña
+                <input
+                  type="password"
+                  placeholder="Contraseña"
+                  value={form.contrasena}
+                  onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
+                />
+              </label>
+              <label>
+                Rol
+                <select
+                  value={form.rol}
+                  onChange={(e) => setForm({ ...form, rol: e.target.value })}
+                >
+                  <option value="CLIENTE">Cliente</option>
+                  <option value="ADMINISTRADOR">Administrador</option>
+                </select>
+              </label>
+              <div className="modal-crear-acciones">
+                <button type="button" className="btn-cancelar-modal" onClick={() => setModalAbierto(false)}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn-guardar-modal" disabled={guardando}>
+                  {guardando ? "Creando..." : "Crear Usuario"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

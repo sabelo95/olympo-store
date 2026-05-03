@@ -11,7 +11,7 @@ const LoginCard = () => {
       <nav className="login-navbar">
         <div className="login-navbar-brand" onClick={() => navigate("/productos")}>
           <img src={logo} alt="Olympo Store" className="login-navbar-logo-nav" />
-          <span className="login-navbar-nombre">Olympo Store</span>
+          <span className="login-navbar-nombre" style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 20, textTransform: "uppercase", letterSpacing: "0.04em" }}>OLYMPO<small style={{ display: "block", fontFamily: "var(--font-body)", fontSize: 8, letterSpacing: "0.32em", color: "var(--olympo-lime)", marginTop: 2, fontWeight: 700 }}>· STORE ·</small></span>
         </div>
         <button className="login-navbar-back" onClick={() => navigate("/productos")}>
           ← Volver a la tienda
@@ -23,8 +23,8 @@ const LoginCard = () => {
         <div className="login-card">
           <div className="login-card-header">
             <img src={logo} alt="Olympo Store" className="login-logo" />
-            <h1>Iniciar sesión</h1>
-            <p>Inicia sesión para tener tus datos de envío guardados</p>
+            <h1>INICIAR SESIÓN</h1>
+            <p>Guarda tus datos de envío y sigue tus pedidos</p>
           </div>
 
           <LoginForm />
